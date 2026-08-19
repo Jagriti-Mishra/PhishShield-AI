@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resExecTime = document.getElementById("res-exec-time");
   const resScreenshotImg = document.getElementById("res-screenshot-img");
   const resReasonsList = document.getElementById("res-reasons-list");
+  const visualOverlay = document.getElementById("visual-detection-overlay");
 
   // Metrics
   const mVisionVal = document.getElementById("m-vision-val");
@@ -38,6 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnAddBrand = document.getElementById("btn-add-brand");
   const brandRegMsg = document.getElementById("brand-reg-msg");
 
+  // Bulk Scanner elements
+  const bulkUrlsInput = document.getElementById("bulk-urls-input");
+  const btnRunBulk = document.getElementById("btn-run-bulk");
+  const bulkResultsBox = document.getElementById("bulk-results");
+  const bulkTableBody = document.getElementById("bulk-table-body");
+  const btnCloseBulk = document.getElementById("btn-close-bulk");
+
   let currentAnalysisData = null;
 
   function runAnalysis(urlToScan) {
@@ -56,23 +64,31 @@ document.addEventListener("DOMContentLoaded", () => {
       currentAnalysisData = data;
 
       emptyState.classList.add("hidden");
+      bulkResultsBox.classList.add("hidden");
       activeResults.classList.remove("hidden");
 
       const assessment = data.assessment || {};
       const score = assessment.overall_score || 0;
       const level = assessment.risk_level || "SAFE";
       const details = data.details || {};
+      const vision = details.vision_analysis || {};
 
       resUrlTitle.textContent = data.url;
       resExecTime.textContent = `Execution: ${data.execution_time_seconds || 0.38}s`;
       resScoreNumber.textContent = `${score}%`;
       resActionText.textContent = assessment.action_recommendation || "";
 
-      // Screenshot
+      // Screenshot & Overlay
       if (data.screenshot_url) {
         resScreenshotImg.src = data.screenshot_url;
       } else {
         resScreenshotImg.src = "https://via.placeholder.com/600x400?text=No+Viewport+Capture";
+      }
+
+      if (level === "CRITICAL PHISHING" || vision.is_clone) {
+        visualOverlay.classList.remove("hidden");
+      } else {
+        visualOverlay.classList.add("hidden");
       }
 
       // Risk Badge Color & Text
@@ -102,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Metric breakdowns
-      const vision = details.vision_analysis || {};
       const dom = details.dom_analysis || {};
       const urlA = details.url_analysis || {};
       const meta = details.metadata_analysis || {};
@@ -136,6 +151,58 @@ document.addEventListener("DOMContentLoaded", () => {
       inputUrl.value = url;
       runAnalysis(url);
     });
+  });
+
+  // Bulk Batch Scanner Handler
+  btnRunBulk.addEventListener("click", async () => {
+    const rawLines = bulkUrlsInput.value.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+    if (rawLines.length === 0) {
+      alert("Please enter at least one URL to batch scan!");
+      return;
+    }
+
+    btnRunBulk.disabled = true;
+    btnRunBulk.textContent = "Scanning Batch Queue...";
+    bulkTableBody.innerHTML = "";
+
+    emptyState.classList.add("hidden");
+    activeResults.classList.add("hidden");
+    bulkResultsBox.classList.remove("hidden");
+
+    for (const urlItem of rawLines) {
+      try {
+        const res = await fetch(`${API_BASE}/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: urlItem })
+        });
+        const data = await res.json();
+        const score = data.assessment?.overall_score || 0;
+        const level = data.assessment?.risk_level || "SAFE";
+        const topReason = data.assessment?.explainable_reasons?.[0] || "Passed all checks";
+
+        const badgeStyle = (level === "CRITICAL PHISHING") ? "color: #ef4444;" : (level === "SUSPICIOUS" ? "color: #f59e0b;" : "color: #10b981;");
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td style="font-family: monospace;">${urlItem}</td>
+          <td><strong>${score}%</strong></td>
+          <td style="${badgeStyle} font-weight: 700;">${level}</td>
+          <td style="color: #9ca3af; font-size: 11px;">${topReason}</td>
+        `;
+        bulkTableBody.appendChild(row);
+      } catch (err) {
+        console.error("Bulk scan item error:", err);
+      }
+    }
+
+    btnRunBulk.disabled = false;
+    btnRunBulk.textContent = "Execute Batch Scan";
+  });
+
+  btnCloseBulk.addEventListener("click", () => {
+    bulkResultsBox.classList.add("hidden");
+    emptyState.classList.remove("hidden");
   });
 
   // Dynamic Brand Indexing

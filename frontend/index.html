@@ -40,7 +40,7 @@
       <div class="nav-status">
         <span class="status-dot"></span>
         <span>PyTorch Engine Online</span>
-        <span class="version-pill">v1.2.0</span>
+        <span class="version-pill">v1.3.0</span>
       </div>
     </header>
 
@@ -70,6 +70,14 @@
           <button class="preset-chip chip-phish" data-url="http://paypal-login-secure-auth.xyz">⚠️ Fake PayPal Phishing</button>
           <button class="preset-chip chip-safe" data-url="https://sbi.co.in">✅ Official SBI Site</button>
           <button class="preset-chip chip-safe" data-url="https://paypal.com">✅ Official PayPal Site</button>
+        </div>
+
+        <!-- Bulk Domain Scanner Tab -->
+        <div class="arch-box bulk-box">
+          <h3>⚡ Bulk Batch Scanner (WHOIS Feed Inspector)</h3>
+          <p class="box-desc">Paste multiple URLs (one per line) to process batch threat scans:</p>
+          <textarea id="bulk-urls-input" rows="3" placeholder="http://sbi-online-kyc-update.top&#10;https://paypal.com&#10;http://paypal-login-secure-auth.xyz"></textarea>
+          <button id="btn-run-bulk" class="btn-run-bulk">Execute Batch Scan</button>
         </div>
 
         <!-- Dynamic Brand Registration Box -->
@@ -118,6 +126,30 @@
           <p>Submit a URL or click one of the quick demo links above to view real-time visual AI feature extraction and threat diagnostics.</p>
         </div>
 
+        <!-- Bulk Results View -->
+        <div id="bulk-results" class="bulk-results-box hidden">
+          <div class="results-header">
+            <div>
+              <span class="res-sub">BULK BATCH SCAN RESULTS</span>
+              <h2>Batch Threat Intelligence Queue</h2>
+            </div>
+            <button id="btn-close-bulk" class="close-btn">✕ Close</button>
+          </div>
+          <table class="bulk-table">
+            <thead>
+              <tr>
+                <th>Target URL</th>
+                <th>Risk Score</th>
+                <th>Risk Level</th>
+                <th>Primary Threat Finding</th>
+              </tr>
+            </thead>
+            <tbody id="bulk-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
         <!-- Active Analysis View -->
         <div id="active-results" class="active-results hidden">
           
@@ -140,7 +172,7 @@
               <p id="res-action-text" class="action-recommendation">BLOCK ACCESS IMMEDIATELY.</p>
             </div>
 
-            <!-- Screenshot Capture Frame -->
+            <!-- Screenshot Capture Frame with Overlay -->
             <div class="screenshot-card">
               <div class="ss-header">
                 <span>📸 Rendered Page Viewport Capture</span>
@@ -148,6 +180,11 @@
               </div>
               <div class="ss-body">
                 <img id="res-screenshot-img" src="" alt="Captured Screenshot">
+                <div id="visual-detection-overlay" class="visual-overlay hidden">
+                  <div class="overlay-box">
+                    <span class="overlay-tag">👁️ PyTorch ResNet Visual Match: 98.2%</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

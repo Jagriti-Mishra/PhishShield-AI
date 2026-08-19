@@ -31,6 +31,9 @@ backend/data/captures/*.png
 scratch/
 *.log
 
+# Large Datasets
+problemStatements.xlsx
+
 # IDE & System Files
 .vscode/
 .idea/

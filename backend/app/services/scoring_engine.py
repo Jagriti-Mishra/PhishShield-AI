@@ -2,6 +2,22 @@ from app.config import settings
 
 class ScoringEngine:
     def compute(self, url_res: dict, vision_res: dict, dom_res: dict, meta_res: dict) -> dict:
+        # 1. If domain is verified as an official brand domain or legitimate subdomain -> Instantly SAFE
+        if url_res.get("is_official"):
+            return {
+                "overall_score": 0.0,
+                "risk_level": "SAFE",
+                "badge_color": "#10B981", # Green
+                "action_recommendation": f"Official verified domain ({url_res.get('netloc')}) for brand '{url_res.get('target_brand_matched')}'. Website is legitimate.",
+                "breakdown": {
+                    "vision": {"score": 0.0, "weight": settings.WEIGHT_VISION},
+                    "dom": {"score": 0.0, "weight": settings.WEIGHT_DOM},
+                    "url": {"score": 0.0, "weight": settings.WEIGHT_URL},
+                    "metadata": {"score": 0.0, "weight": settings.WEIGHT_METADATA}
+                },
+                "explainable_reasons": []
+            }
+
         w_vision = settings.WEIGHT_VISION
         w_dom = settings.WEIGHT_DOM
         w_url = settings.WEIGHT_URL
@@ -15,12 +31,14 @@ class ScoringEngine:
         # Calculate weighted overall score
         overall_score = (v_score * w_vision) + (d_score * w_dom) + (u_score * w_url) + (m_score * w_meta)
 
-        # Critical Overrides: If visual clone or form post to raw IP with password occurs
+        # Critical Overrides
         if vision_res.get("is_clone"):
             overall_score = max(overall_score, 88.0)
         if dom_res.get("insecure_password_post"):
             overall_score = max(overall_score, 82.0)
-        if url_res.get("homoglyph_detected") and url_res.get("typosquatting_detected"):
+        if url_res.get("typosquatting_detected"):
+            overall_score = max(overall_score, 75.0)
+        if url_res.get("homoglyph_detected"):
             overall_score = max(overall_score, 78.0)
 
         overall_score = min(100.0, round(overall_score, 2))

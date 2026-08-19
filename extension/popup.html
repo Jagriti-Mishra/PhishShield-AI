@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PhishShield AI Badge</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="logo-title">
+        <span class="shield-icon">🛡️</span>
+        <div>
+          <h2>PhishShield AI</h2>
+          <p class="subtitle">SIH 1454 Security Guard</p>
+        </div>
+      </div>
+      <span id="badge-pill" class="badge badge-safe">SAFE</span>
+    </div>
+
+    <div class="url-box">
+      <span class="url-label">ACTIVE TAB URL:</span>
+      <div id="current-url" class="url-text">Loading...</div>
+    </div>
+
+    <div class="risk-gauge-container">
+      <div class="risk-header">
+        <span>AI Risk Assessment</span>
+        <span id="risk-score-value">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill fill-safe" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <div class="breakdown-grid">
+      <div class="breakdown-item">
+        <span class="b-label">Visual Match</span>
+        <span id="b-vision" class="b-val">0%</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="b-label">DOM & Code</span>
+        <span id="b-dom" class="b-val">0%</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="b-label">Typosquatting</span>
+        <span id="b-url" class="b-val">0%</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="b-label">SSL & Metadata</span>
+        <span id="b-meta" class="b-val">0%</span>
+      </div>
+    </div>
+
+    <div class="reasons-section">
+      <h3>Explainable Risk Findings:</h3>
+      <ul id="reasons-list">
+        <li class="empty-msg">Scanning website URL and layout...</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button id="scan-btn" class="btn btn-primary">🔄 Re-Scan Page</button>
+      <button id="dashboard-btn" class="btn btn-secondary">📊 Open SOC Dashboard</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

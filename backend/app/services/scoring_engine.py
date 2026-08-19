@@ -31,7 +31,7 @@ class ScoringEngine:
         # Calculate weighted overall score
         overall_score = (v_score * w_vision) + (d_score * w_dom) + (u_score * w_url) + (m_score * w_meta)
 
-        # High-Impact Threat Overrides for Phishing Impersonations
+        # Critical Overrides (Red Badge: >= 70%)
         if vision_res.get("is_clone"):
             overall_score = max(overall_score, 98.0)
         if url_res.get("typosquatting_detected"):
@@ -44,6 +44,12 @@ class ScoringEngine:
             overall_score = max(overall_score, 94.0)
         elif u_score >= 60.0:
             overall_score = max(overall_score, 88.0)
+
+        # Medium Risk Overrides (Yellow Badge: 35% - 69%)
+        if not meta_res.get("is_https"):
+            overall_score = max(overall_score, 45.0)
+        elif m_score >= 35.0:
+            overall_score = max(overall_score, 40.0)
 
         overall_score = min(100.0, round(overall_score, 2))
 

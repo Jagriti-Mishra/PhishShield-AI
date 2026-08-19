@@ -78,7 +78,7 @@ class URLAnalyzer:
                     min_distance = dist
                     break
 
-        # Scoring heuristics
+        # Scoring heuristics (Aggressive Phishing Threat Weights)
         score = 0.0
         reasons = []
 
@@ -87,19 +87,19 @@ class URLAnalyzer:
             score = 0.0
         else:
             if is_ip:
-                score += 40.0
+                score += 65.0
                 reasons.append("Raw IP address used instead of domain name")
 
             if homoglyph_detected:
-                score += 35.0
+                score += 65.0
                 reasons.append("Unicode Homoglyph attack characters detected in domain")
 
             if typosquatting_detected:
-                score += 45.0
+                score += 70.0
                 reasons.append(f"Typosquatting detected against legitimate brand '{target_brand_matched}' (Distance: {min_distance})")
 
             if tld in SUSPICIOUS_TLDS:
-                score += 20.0
+                score += 25.0
                 reasons.append(f"High-risk TLD detected: '{tld}'")
 
             if len(parts) > 3:
@@ -107,7 +107,7 @@ class URLAnalyzer:
                 reasons.append("Excessive subdomains used to obscure origin")
 
             if "-" in domain_name and typosquatting_detected:
-                score += 10.0
+                score += 15.0
                 reasons.append("Suspicious hyphenation in brand-like domain")
 
             score = min(100.0, score)

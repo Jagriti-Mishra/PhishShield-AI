@@ -31,15 +31,19 @@ class ScoringEngine:
         # Calculate weighted overall score
         overall_score = (v_score * w_vision) + (d_score * w_dom) + (u_score * w_url) + (m_score * w_meta)
 
-        # Critical Overrides
+        # High-Impact Threat Overrides for Phishing Impersonations
         if vision_res.get("is_clone"):
-            overall_score = max(overall_score, 88.0)
-        if dom_res.get("insecure_password_post"):
-            overall_score = max(overall_score, 82.0)
+            overall_score = max(overall_score, 98.0)
         if url_res.get("typosquatting_detected"):
-            overall_score = max(overall_score, 75.0)
+            overall_score = max(overall_score, 94.0)
         if url_res.get("homoglyph_detected"):
-            overall_score = max(overall_score, 78.0)
+            overall_score = max(overall_score, 96.0)
+        if dom_res.get("insecure_password_post"):
+            overall_score = max(overall_score, 92.0)
+        if u_score >= 80.0:
+            overall_score = max(overall_score, 94.0)
+        elif u_score >= 60.0:
+            overall_score = max(overall_score, 88.0)
 
         overall_score = min(100.0, round(overall_score, 2))
 

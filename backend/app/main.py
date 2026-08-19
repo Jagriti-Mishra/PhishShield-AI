@@ -15,6 +15,7 @@ from app.services.dom_analyzer import DOMAnalyzer
 from app.services.metadata_analyzer import MetadataAnalyzer
 from app.services.scoring_engine import ScoringEngine
 from app.utils.stix_exporter import STIXExporter
+from app.services.url_analyzer import TARGET_BRANDS
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -44,6 +45,10 @@ stix_exporter = STIXExporter()
 class URLRequest(BaseModel):
     url: str
 
+class NewBrandRequest(BaseModel):
+    brand_name: str
+    official_domain: str
+
 @app.get("/api/v1/health")
 def health_check():
     return {"status": "online", "project": settings.PROJECT_NAME, "version": settings.VERSION}
@@ -51,6 +56,26 @@ def health_check():
 @app.get("/api/v1/brands")
 def list_monitored_brands():
     return {"count": len(vector_store.brands), "brands": list(vector_store.brands.keys())}
+
+@app.post("/api/v1/brands/add")
+def add_monitored_brand(req: NewBrandRequest):
+    brand_clean = req.brand_name.strip().lower()
+    domain_clean = req.official_domain.strip().lower().replace("http://", "").replace("https://", "").split("/")[0]
+
+    # Generate visual embedding signature using crawler
+    screenshot_path, _, _ = crawler.capture(f"https://{domain_clean}")
+    embedding = vision_analyzer.extract_embedding(screenshot_path)
+
+    # Register in VectorStore & URLAnalyzer
+    vector_store.add_brand(brand_clean, domain_clean, embedding, {"category": "User Added", "added_at": time.time()})
+    TARGET_BRANDS[brand_clean] = domain_clean
+
+    return {
+        "message": f"Successfully registered brand '{brand_clean}' ({domain_clean}) into PyTorch VectorStore index",
+        "brand_name": brand_clean,
+        "official_domain": domain_clean,
+        "vector_size": len(embedding)
+    }
 
 @app.post("/api/v1/analyze")
 def analyze_url(req: URLRequest):
@@ -101,13 +126,16 @@ def analyze_url(req: URLRequest):
 def export_stix(payload: dict = Body(...)):
     url = payload.get("url", "")
     assessment = payload.get("assessment", {})
+    netloc = payload.get("netloc", url)
     
     stix_json = stix_exporter.generate_stix_bundle(url, assessment)
-    dns_rule = stix_exporter.generate_dns_sinkhole_rule(payload.get("netloc", url))
+    dns_rule = stix_exporter.generate_dns_sinkhole_rule(netloc)
+    takedown_notice = stix_exporter.generate_takedown_notice(url, netloc, assessment)
 
     return {
         "stix_bundle": stix_json,
-        "dns_sinkhole_rule": dns_rule
+        "dns_sinkhole_rule": dns_rule,
+        "takedown_notice": takedown_notice
     }
 
 # Static Mount for Captured Screenshots and Frontend

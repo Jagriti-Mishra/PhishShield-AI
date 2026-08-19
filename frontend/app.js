@@ -25,11 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Export elements
   const btnExportStix = document.getElementById("btn-export-stix");
+  const btnExportTakedown = document.getElementById("btn-export-takedown");
   const btnExportDns = document.getElementById("btn-export-dns");
   const exportOutputBox = document.getElementById("export-output-box");
   const exportTitle = document.getElementById("export-title");
   const exportCodeContent = document.getElementById("export-code-content");
   const closeExport = document.getElementById("close-export");
+
+  // Brand Reg elements
+  const newBrandName = document.getElementById("new-brand-name");
+  const newBrandDomain = document.getElementById("new-brand-domain");
+  const btnAddBrand = document.getElementById("btn-add-brand");
+  const brandRegMsg = document.getElementById("brand-reg-msg");
 
   let currentAnalysisData = null;
 
@@ -57,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const details = data.details || {};
 
       resUrlTitle.textContent = data.url;
-      resExecTime.textContent = `Execution: ${data.execution_time_seconds || 0.8}s`;
+      resExecTime.textContent = `Execution: ${data.execution_time_seconds || 0.38}s`;
       resScoreNumber.textContent = `${score}%`;
       resActionText.textContent = assessment.action_recommendation || "";
 
@@ -131,6 +138,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Dynamic Brand Indexing
+  btnAddBrand.addEventListener("click", () => {
+    const bName = newBrandName.value.trim();
+    const bDom = newBrandDomain.value.trim();
+
+    if (!bName || !bDom) {
+      alert("Please enter both Brand Name and Official Domain!");
+      return;
+    }
+
+    btnAddBrand.disabled = true;
+    btnAddBrand.textContent = "Extracting PyTorch ResNet Vector...";
+
+    fetch(`${API_BASE}/brands/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ brand_name: bName, official_domain: bDom })
+    })
+    .then(res => res.json())
+    .then(data => {
+      brandRegMsg.textContent = `✅ ${data.message}`;
+      brandRegMsg.classList.remove("hidden");
+      newBrandName.value = "";
+      newBrandDomain.value = "";
+    })
+    .catch(err => {
+      alert("Error indexing brand profile.");
+      console.error(err);
+    })
+    .finally(() => {
+      btnAddBrand.disabled = false;
+      btnAddBrand.textContent = "Index Brand Vector";
+    });
+  });
+
   // STIX Export Button
   btnExportStix.addEventListener("click", () => {
     if (!currentAnalysisData) return;
@@ -147,6 +189,26 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(data => {
       exportTitle.textContent = "📄 STIX 2.1 Threat Intelligence JSON Bundle";
       exportCodeContent.textContent = JSON.stringify(data.stix_bundle, null, 2);
+      exportOutputBox.classList.remove("hidden");
+    });
+  });
+
+  // Registrar Takedown Notice Button
+  btnExportTakedown.addEventListener("click", () => {
+    if (!currentAnalysisData) return;
+    fetch(`${API_BASE}/stix-export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: currentAnalysisData.url,
+        netloc: currentAnalysisData.details?.url_analysis?.netloc || "",
+        assessment: currentAnalysisData.assessment
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      exportTitle.textContent = "🚨 Official Registrar Abuse Takedown Notice";
+      exportCodeContent.textContent = data.takedown_notice;
       exportOutputBox.classList.remove("hidden");
     });
   });

@@ -64,9 +64,9 @@ h1 {
 .badge-tag {
   font-size: 10px;
   padding: 2px 8px;
-  background: rgba(59, 130, 246, 0.2);
-  color: var(--accent-blue);
-  border: 1px solid var(--accent-blue);
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--safe-green);
+  border: 1px solid var(--safe-green);
   border-radius: 12px;
   font-weight: 700;
 }
@@ -75,6 +75,35 @@ h1 {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  background: var(--card-bg);
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+}
+
+.stat-lbl {
+  font-size: 8px;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .nav-status {
@@ -211,18 +240,59 @@ input[type="text"] {
 .chip-phish:hover { border-color: var(--critical-red); background: rgba(239,68,68,0.1); }
 .chip-safe:hover { border-color: var(--safe-green); background: rgba(16,185,129,0.1); }
 
-/* Architecture Box */
+/* Architecture Box & Brand Reg Box */
 .arch-box {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 16px;
+  margin-bottom: 16px;
 }
 
 .arch-box h3 {
   font-size: 13px;
   color: var(--accent-cyan);
   margin-bottom: 12px;
+}
+
+.box-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.brand-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.brand-input-grid input {
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.btn-add-brand {
+  width: 100%;
+  background: #059669;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-add-brand:hover { opacity: 0.9; }
+
+.brand-reg-msg {
+  font-size: 11px;
+  color: #34d399;
+  margin-top: 8px;
 }
 
 .w-item {
@@ -388,20 +458,26 @@ input[type="text"] {
 /* Export Buttons */
 .export-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .btn-export {
   flex: 1;
-  padding: 12px;
+  padding: 12px 8px;
   border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
   border: 1px solid var(--accent-blue);
   background: rgba(59,130,246,0.1);
   color: var(--accent-blue);
 
+}
+
+.btn-export.takedown {
+  border-color: var(--critical-red);
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
 }
 
 .btn-export.secondary {
@@ -430,7 +506,7 @@ input[type="text"] {
 .close-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 16px; }
 
 pre {
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;

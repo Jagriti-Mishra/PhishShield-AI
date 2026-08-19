@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishShield AI — SOC Security Admin Operations Center (SIH 1454)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <span class="shield-logo">🛡️</span>
+        <div>
+          <h1>PhishShield AI <span class="badge-tag">SIH 1454 PROT-TYPE</span></h1>
+          <p class="nav-sub">Multimodal Vision & DOM Phishing Domain Detection Platform</p>
+        </div>
+      </div>
+      <div class="nav-status">
+        <span class="status-dot"></span>
+        <span>AI Engine API Online</span>
+        <span class="version-pill">v1.0.0</span>
+      </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="main-content">
+      
+      <!-- Left Panel: URL Input & Active Controls -->
+      <section class="control-card">
+        <h2>🔍 Analyze Suspicious URL</h2>
+        <p class="card-desc">Enter any web address to execute dynamic stealth crawling, computer vision visual matching, and DOM AST inspection.</p>
+
+        <form id="analyze-form" class="url-input-form">
+          <div class="input-group">
+            <span class="input-icon">🌐</span>
+            <input type="text" id="target-url" placeholder="e.g. sbi-online-kyc-update.top or paypal.com" required value="sbi-online-kyc-update.top">
+            <button type="submit" id="submit-btn" class="btn-scan">
+              <span>Run AI Inspection</span>
+              <span class="spinner hidden" id="btn-spinner"></span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Demo Presets -->
+        <div class="demo-presets">
+          <span class="preset-title">Quick Demo Links:</span>
+          <button class="preset-chip chip-phish" data-url="http://sbi-online-kyc-update.top">⚠️ Fake SBI Phishing</button>
+          <button class="preset-chip chip-phish" data-url="http://paypal-login-secure-auth.xyz">⚠️ Fake PayPal Phishing</button>
+          <button class="preset-chip chip-safe" data-url="https://sbi.co.in">✅ Official SBI Site</button>
+          <button class="preset-chip chip-safe" data-url="https://paypal.com">✅ Official PayPal Site</button>
+        </div>
+
+        <!-- System Architecture Card -->
+        <div class="arch-box">
+          <h3>🧠 Multimodal AI Pipeline Weights</h3>
+          <div class="weight-bar-group">
+            <div class="w-item">
+              <span class="w-label">👁️ ResNet Vision Match (35%)</span>
+              <div class="w-bar"><div class="w-fill" style="width: 35%;"></div></div>
+            </div>
+            <div class="w-item">
+              <span class="w-label">📜 DOM & AST Code (30%)</span>
+              <div class="w-bar"><div class="w-fill" style="width: 30%;"></div></div>
+            </div>
+            <div class="w-item">
+              <span class="w-label">🔤 Typosquatting NLP (20%)</span>
+              <div class="w-bar"><div class="w-fill" style="width: 20%;"></div></div>
+            </div>
+            <div class="w-item">
+              <span class="w-label">🔒 SSL & Metadata (15%)</span>
+              <div class="w-bar"><div class="w-fill" style="width: 15%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Results & Interactive Security Dashboard -->
+      <section class="results-card" id="results-panel">
+        
+        <!-- Default Empty State -->
+        <div id="empty-state" class="empty-state">
+          <div class="radar-icon">📡</div>
+          <h3>Awaiting URL Analysis</h3>
+          <p>Submit a URL or click one of the quick demo links above to view real-time visual AI feature extraction and threat diagnostics.</p>
+        </div>
+
+        <!-- Active Analysis View -->
+        <div id="active-results" class="active-results hidden">
+          
+          <div class="results-header">
+            <div>
+              <span class="res-sub">SECURITY ASSESSMENT REPORT</span>
+              <h2 id="res-url-title">http://sbi-online-kyc-update.top</h2>
+            </div>
+            <div id="res-risk-badge" class="risk-badge badge-critical">CRITICAL PHISHING</div>
+          </div>
+
+          <!-- Overall Score & Visual Preview Grid -->
+          <div class="overview-grid">
+            <div class="score-card">
+              <span class="score-title">Overall Risk Score</span>
+              <div class="score-val-row">
+                <span id="res-score-number" class="score-number">94.5%</span>
+                <span class="score-max">/ 100</span>
+              </div>
+              <p id="res-action-text" class="action-recommendation">BLOCK ACCESS IMMEDIATELY.</p>
+            </div>
+
+            <!-- Screenshot Capture Frame -->
+            <div class="screenshot-card">
+              <div class="ss-header">
+                <span>📸 Rendered Page Viewport Capture</span>
+                <span id="res-exec-time" class="exec-time">Execution: 1.2s</span>
+              </div>
+              <div class="ss-body">
+                <img id="res-screenshot-img" src="" alt="Captured Screenshot">
+              </div>
+            </div>
+          </div>
+
+          <!-- Explainable Risk Findings -->
+          <div class="explain-box">
+            <h3>⚠️ Explainable Risk Findings</h3>
+            <ul id="res-reasons-list" class="reasons-list">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+
+          <!-- 4-Engine Breakdown Metrics -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="m-title">Visual Clone Match</span>
+              <span id="m-vision-val" class="m-val">98.2%</span>
+              <span id="m-vision-sub" class="m-sub">Matched: State Bank of India</span>
+            </div>
+            <div class="metric-card">
+              <span class="m-title">DOM & Form Post</span>
+              <span id="m-dom-val" class="m-val">50.0%</span>
+              <span id="m-dom-sub" class="m-sub">Form action mismatch</span>
+            </div>
+            <div class="metric-card">
+              <span class="m-title">Typosquatting NLP</span>
+              <span id="m-url-val" class="m-val">45.0%</span>
+              <span id="m-url-sub" class="m-sub">Brand similarity detected</span>
+            </div>
+            <div class="metric-card">
+              <span class="m-title">SSL & Security Headers</span>
+              <span id="m-meta-val" class="m-val">35.0%</span>
+              <span id="m-meta-sub" class="m-sub">HTTP connection</span>
+            </div>
+          </div>
+
+          <!-- Threat Intelligence Export Actions -->
+          <div class="export-actions">
+            <button id="btn-export-stix" class="btn-export">📄 Export STIX 2.1 Threat Bundle (JSON)</button>
+            <button id="btn-export-dns" class="btn-export secondary">🚫 Generate DNS Sinkhole Rule</button>
+          </div>
+
+          <!-- Exported Output Modal Container -->
+          <div id="export-output-box" class="export-output-box hidden">
+            <div class="export-header">
+              <span id="export-title">STIX 2.1 JSON Threat Bundle</span>
+              <button id="close-export" class="close-btn">✕</button>
+            </div>
+            <pre><code id="export-code-content">// Exported STIX JSON data</code></pre>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

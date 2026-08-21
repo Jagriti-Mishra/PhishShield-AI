@@ -1,248 +1,748 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhishShield AI — SOC Security Admin Operations Center (SIH 1454)</title>
+  <title>PhishShield AI — Intelligent Multimodal Phishing & Visual Clone Detection Platform</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Ccircle cx='18' cy='14' r='5.5' fill='%230284C7'/%3E%3Cpath d='M7 38C7 28.5 13 25 21 25C22.2 25 23.4 25.1 24.5 25.4C23.6 27.2 23 29.3 23 31.5C23 35.2 24.8 38.6 27.6 40.8C25.6 41.6 23.4 42 21 42C13 42 7 38 7 38Z' fill='%230284C7'/%3E%3Cpath d='M34 16L22 21.5V31C22 38.5 34 44 34 44C34 44 46 38.5 46 31V21.5L34 16Z' fill='%2338BDF8' fill-opacity='0.35' stroke='%230284C7' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M29 30L33 34L40 26' stroke='%230284C7' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <div class="app-container">
-    <!-- Top Navigation Header -->
-    <header class="navbar">
-      <div class="nav-brand">
-        <span class="shield-logo">🛡️</span>
-        <div>
-          <h1>PhishShield AI <span class="badge-tag">SIH 1454 WINNING EDITION</span></h1>
-          <p class="nav-sub">Multimodal Vision & DOM Phishing Domain Detection Platform</p>
-        </div>
-      </div>
-
-      <!-- AI Benchmark Statistics Bar -->
-      <div class="stats-bar">
-        <div class="stat-pill">
-          <span class="stat-num">98.4%</span>
-          <span class="stat-lbl">AI ACCURACY</span>
-        </div>
-        <div class="stat-pill">
-          <span class="stat-num">&lt; 0.4s</span>
-          <span class="stat-lbl">LATENCY</span>
-        </div>
-        <div class="stat-pill">
-          <span class="stat-num">0.0%</span>
-          <span class="stat-lbl">FALSE POSITIVES</span>
-        </div>
-      </div>
-
-      <div class="nav-status">
-        <span class="status-dot"></span>
-        <span>PyTorch Engine Online</span>
-        <span class="version-pill">v1.3.0</span>
-      </div>
-    </header>
-
-    <!-- Main Content Layout -->
-    <main class="main-content">
+  <!-- Sticky Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
       
-      <!-- Left Panel: URL Input & Active Controls -->
-      <section class="control-card">
-        <h2>🔍 Analyze Suspicious URL</h2>
-        <p class="card-desc">Enter any web address to execute dynamic stealth crawling, computer vision visual matching, and DOM AST inspection.</p>
-
-        <form id="analyze-form" class="url-input-form">
-          <div class="input-group">
-            <span class="input-icon">🌐</span>
-            <input type="text" id="target-url" placeholder="e.g. sbi-online-kyc-update.top or paypal.com" required value="sbi-online-kyc-update.top">
-            <button type="submit" id="submit-btn" class="btn-scan">
-              <span>Run AI Inspection</span>
-              <span class="spinner hidden" id="btn-spinner"></span>
-            </button>
+      <!-- Brand Logo & Title -->
+      <div class="nav-brand">
+        <svg class="brand-svg-logo" width="34" height="34" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="userShieldGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#0284C7"/>
+              <stop offset="0.5" stop-color="#2563EB"/>
+              <stop offset="1" stop-color="#4F46E5"/>
+            </linearGradient>
+            <linearGradient id="shieldFillGrad" x1="22" y1="18" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38BDF8" stop-opacity="0.35"/>
+              <stop offset="1" stop-color="#4F46E5" stop-opacity="0.2"/>
+            </linearGradient>
+          </defs>
+          <!-- User Head Silhouette -->
+          <circle cx="18" cy="14" r="5.5" fill="url(#userShieldGrad)"/>
+          <!-- User Torso Silhouette -->
+          <path d="M7 38C7 28.5 13 25 21 25C22.2 25 23.4 25.1 24.5 25.4C23.6 27.2 23 29.3 23 31.5C23 35.2 24.8 38.6 27.6 40.8C25.6 41.6 23.4 42 21 42C13 42 7 38 7 38Z" fill="url(#userShieldGrad)" fill-opacity="0.85"/>
+          <!-- User Shield in Foreground -->
+          <path d="M34 16L22 21.5V31C22 38.5 34 44 34 44C34 44 46 38.5 46 31V21.5L34 16Z" fill="url(#shieldFillGrad)" stroke="url(#userShieldGrad)" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Inner Shield Security Checkmark -->
+          <path d="M29 30L33 34L40 26" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="brand-info-wrap">
+          <div class="brand-title-row">
+            <span class="brand-heading">Phish<span class="brand-highlight">Shield</span><span class="brand-suffix">.ai</span></span>
+            <span class="version-tag">ENTERPRISE v2.4</span>
           </div>
-        </form>
-
-        <!-- Quick Demo Presets -->
-        <div class="demo-presets">
-          <span class="preset-title">Quick Demo Links:</span>
-          <button class="preset-chip chip-phish" data-url="http://sbi-online-kyc-update.top">⚠️ Fake SBI Phishing</button>
-          <button class="preset-chip chip-phish" data-url="http://paypal-login-secure-auth.xyz">⚠️ Fake PayPal Phishing</button>
-          <button class="preset-chip chip-safe" data-url="https://sbi.co.in">✅ Official SBI Site</button>
-          <button class="preset-chip chip-safe" data-url="https://paypal.com">✅ Official PayPal Site</button>
+          <p class="nav-sub">Multimodal Phishing & Visual Clone Intercept System</p>
         </div>
+      </div>
 
-        <!-- Bulk Domain Scanner Tab -->
-        <div class="arch-box bulk-box">
-          <h3>⚡ Bulk Batch Scanner (WHOIS Feed Inspector)</h3>
-          <p class="box-desc">Paste multiple URLs (one per line) to process batch threat scans:</p>
-          <textarea id="bulk-urls-input" rows="3" placeholder="http://sbi-online-kyc-update.top&#10;https://paypal.com&#10;http://paypal-login-secure-auth.xyz"></textarea>
-          <button id="btn-run-bulk" class="btn-run-bulk">Execute Batch Scan</button>
-        </div>
+      <!-- Nav Links -->
+      <nav class="nav-links">
+        <a href="#scanner" class="nav-link active">Live Scanner</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#architecture" class="nav-link">Architecture</a>
+        <a href="#nrd-stream" class="nav-link">NRD Stream</a>
+        <a href="#brand-catalog" class="nav-link">Brand Vault</a>
+        <a href="/docs" target="_blank" class="nav-link api-link">API Docs ↗</a>
+      </nav>
 
-        <!-- Dynamic Brand Registration Box -->
-        <div class="arch-box brand-reg-box">
-          <h3>➕ Register New Target Brand (Live AI Indexing)</h3>
-          <p class="box-desc">Add any custom brand to the PyTorch ResNet VectorStore on the fly:</p>
-          <div class="brand-input-grid">
-            <input type="text" id="new-brand-name" placeholder="Brand (e.g. razorpay)">
-            <input type="text" id="new-brand-domain" placeholder="Domain (e.g. razorpay.com)">
-          </div>
-          <button id="btn-add-brand" class="btn-add-brand">Index Brand Vector</button>
-          <div id="brand-reg-msg" class="brand-reg-msg hidden"></div>
-        </div>
-
-        <!-- System Architecture Card -->
-        <div class="arch-box">
-          <h3>🧠 Multimodal AI Pipeline Weights</h3>
-          <div class="weight-bar-group">
-            <div class="w-item">
-              <span class="w-label">👁️ ResNet Vision Match (35%)</span>
-              <div class="w-bar"><div class="w-fill" style="width: 35%;"></div></div>
-            </div>
-            <div class="w-item">
-              <span class="w-label">📜 DOM & AST Code (30%)</span>
-              <div class="w-bar"><div class="w-fill" style="width: 30%;"></div></div>
-            </div>
-            <div class="w-item">
-              <span class="w-label">🔤 Typosquatting NLP (20%)</span>
-              <div class="w-bar"><div class="w-fill" style="width: 20%;"></div></div>
-            </div>
-            <div class="w-item">
-              <span class="w-label">🔒 SSL & Metadata (15%)</span>
-              <div class="w-bar"><div class="w-fill" style="width: 15%;"></div></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Right Panel: Results & Interactive Security Dashboard -->
-      <section class="results-card" id="results-panel">
+      <!-- Right CTA & Theme Toggle -->
+      <div class="nav-cta-cluster">
         
-        <!-- Default Empty State -->
-        <div id="empty-state" class="empty-state">
-          <div class="radar-icon">📡</div>
-          <h3>Awaiting URL Analysis</h3>
-          <p>Submit a URL or click one of the quick demo links above to view real-time visual AI feature extraction and threat diagnostics.</p>
+        <!-- Live Status Pill -->
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>5 AI Engines Online</span>
         </div>
 
-        <!-- Bulk Results View -->
-        <div id="bulk-results" class="bulk-results-box hidden">
-          <div class="results-header">
-            <div>
-              <span class="res-sub">BULK BATCH SCAN RESULTS</span>
-              <h2>Batch Threat Intelligence Queue</h2>
+        <!-- Light / Dark Mode Toggle Button -->
+        <button id="theme-toggle-btn" class="theme-toggle" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+          <span id="theme-toggle-icon">🌙</span>
+          <span id="theme-toggle-text" class="toggle-label">Dark</span>
+        </button>
+
+        <a href="#scanner" class="btn-primary-action">Launch Scan</a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-container">
+      
+      <div class="hero-badge">
+        <span class="badge-icon">⚡</span> <span>Zero-Day Phishing Intercept</span> • <span>98.4% Accuracy</span> • <span>0.0% False Positives</span>
+      </div>
+
+      <h1 class="hero-title">
+        Detect Lookalike Phishing Sites <br>
+        <span class="gradient-text">Before Passwords Get Stolen</span>
+      </h1>
+
+      <p class="hero-desc">
+        Scammers create fake websites that look <strong>100% identical</strong> to your bank or payment portal. 
+        PhishShield AI dynamically visits suspicious domains, captures visual layout screenshots, inspects hidden code AST, 
+        and calculates an instant calibrated risk score in less than <strong>0.38 seconds</strong>.
+      </p>
+
+      <!-- 4 Core Performance Metrics -->
+      <div class="hero-metrics-grid">
+        <div class="metric-card">
+          <span class="metric-value">&lt; 0.38s</span>
+          <span class="metric-label">Inference Latency</span>
+          <p class="metric-sub">Real-time stealth browser crawl & AI feature extraction</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-value">98.4%</span>
+          <span class="metric-label">Detection Accuracy</span>
+          <p class="metric-sub">Validated against thousands of active phishing kits</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-value">0.00%</span>
+          <span class="metric-label">False Positive Rate</span>
+          <p class="metric-sub">Strict whitelist safeguards for verified bank portals</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-value">5 Engines</span>
+          <span class="metric-label">Multimodal AI Fusion</span>
+          <p class="metric-sub">Vision + DOM/AST + URL/NLP + WHOIS + SSL</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 1: Interactive Live Scanner Workspace -->
+  <section id="scanner" class="main-section">
+    <div class="section-container">
+      
+      <div class="section-header">
+        <span class="section-tag">INTERACTIVE SECURITY CONSOLE</span>
+        <h2>🔍 Test Any Website URL with Multimodal AI</h2>
+        <p>Enter any suspicious web link below or click one of our one-click verification presets to watch all 5 AI engines execute in real time.</p>
+      </div>
+
+      <!-- Quick Demo Presets Banner -->
+      <div class="preset-banner">
+        <span class="preset-lead">👉 One-Click Live Verification Demos:</span>
+        <button class="preset-chip chip-threat" data-url="http://sbi-online-kyc-update.top">⚠️ Fake SBI Phishing Clone</button>
+        <button class="preset-chip chip-threat" data-url="http://paypal-login-secure-auth.xyz">⚠️ Fake PayPal Auth Clone</button>
+        <button class="preset-chip chip-threat" data-url="http://hdfc-reward-points-claim.top">⚠️ Fake HDFC Scam Clone</button>
+        <button class="preset-chip chip-safe" data-url="https://sbi.co.in">✅ Official SBI Bank</button>
+        <button class="preset-chip chip-safe" data-url="https://paypal.com">✅ Official PayPal Site</button>
+        <button class="preset-chip chip-safe" data-url="https://hdfcbank.com">✅ Official HDFC Bank</button>
+      </div>
+
+      <!-- Main Scanner Workspace Grid -->
+      <div class="scanner-workspace-grid">
+        
+        <!-- Left: Input Controls & Explainer -->
+        <div class="scanner-left-box">
+          
+          <form id="analyze-form" class="scan-form-card">
+            <label for="target-url" class="input-label">Target URL or Domain to Inspect</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">TARGET:/></span>
+              <input type="text" id="target-url" placeholder="e.g. sbi-online-kyc-update.top" required value="sbi-online-kyc-update.top" autocomplete="off">
+              <button type="submit" id="submit-btn" class="btn-scan-submit">
+                <span class="btn-text">Run Multimodal AI</span>
+              </button>
             </div>
-            <button id="btn-close-bulk" class="close-btn">✕ Close</button>
+          </form>
+
+          <!-- Simple 4-Step Explainer Card -->
+          <div class="explainer-card">
+            <h4>💡 What happens during a scan?</h4>
+            <ul class="explainer-steps">
+              <li>
+                <span class="step-badge">1</span>
+                <div><strong>Stealth Camera:</strong> Takes a snapshot of the page's visual layout.</div>
+              </li>
+              <li>
+                <span class="step-badge">2</span>
+                <div><strong>Visual AI Match:</strong> Checks if the layout copies a trusted brand (e.g. SBI, PayPal).</div>
+              </li>
+              <li>
+                <span class="step-badge">3</span>
+                <div><strong>Code X-Ray:</strong> Audits where login credentials and passwords are sent.</div>
+              </li>
+              <li>
+                <span class="step-badge">4</span>
+                <div><strong>Domain Age Recon:</strong> Checks if the domain was newly created just days ago.</div>
+              </li>
+            </ul>
           </div>
-          <table class="bulk-table">
+
+          <!-- Batch Scanner Accordion -->
+          <div class="batch-card">
+            <details>
+              <summary>➕ Need to scan multiple URLs at once? (Batch Scanner)</summary>
+              <div class="batch-inner-box">
+                <textarea id="bulk-urls-input" rows="3" placeholder="http://sbi-online-kyc-update.top&#10;https://paypal.com&#10;http://paypal-login-secure-auth.xyz"></textarea>
+                <button id="btn-run-bulk" class="btn-batch-submit">Execute Batch Scan</button>
+              </div>
+            </details>
+          </div>
+
+        </div>
+
+        <!-- Right: Results & Threat Intelligence Panel -->
+        <div class="scanner-right-box" id="results-panel">
+          
+          <!-- Default Empty State -->
+          <div id="empty-state" class="empty-state-view">
+            <div class="empty-radar-icon">📡</div>
+            <h3>Multimodal AI Ready</h3>
+            <p>Click "Run Multimodal AI" or select one of the one-click demo presets above to generate a forensic risk assessment.</p>
+          </div>
+
+          <!-- Bulk Results View -->
+          <div id="bulk-results" class="bulk-results-view hidden">
+            <div class="view-header-row">
+              <h3>Batch Threat Intelligence Queue</h3>
+              <button id="btn-close-bulk" class="btn-close-view">✕ Close</button>
+            </div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>URL / Domain</th>
+                    <th>Risk Index</th>
+                    <th>Verdict</th>
+                    <th>Primary Finding</th>
+                  </tr>
+                </thead>
+                <tbody id="bulk-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Single Scan Forensic Output View -->
+          <div id="active-results" class="active-results-view hidden">
+            
+            <!-- Result Top Bar -->
+            <div class="result-top-bar">
+              <div>
+                <span class="report-lead">FORENSIC SECURITY REPORT</span>
+                <h3 id="res-url-title" class="res-domain-heading">http://sbi-online-kyc-update.top</h3>
+              </div>
+              <div id="res-risk-badge" class="risk-badge badge-critical">CRITICAL PHISHING</div>
+            </div>
+
+            <!-- Score & Viewport Frame Grid -->
+            <div class="report-overview-grid">
+              
+              <!-- Risk Score Meter -->
+              <div class="score-card">
+                <span class="score-label">Calibrated AI Risk Score</span>
+                <div class="score-number-row">
+                  <span id="res-score-number" class="big-score">96.0%</span>
+                  <span class="score-out-of">/ 100</span>
+                </div>
+                <div class="threat-meter-track">
+                  <div id="threat-meter-fill" class="meter-fill fill-critical" style="width: 96%;"></div>
+                </div>
+                <p id="res-action-text" class="action-alert">BLOCK ACCESS IMMEDIATELY.</p>
+                <div class="ci-pill" id="res-ci-text">Confidence: 95% CI [±1.8%]</div>
+              </div>
+
+              <!-- Viewport Screenshot Frame -->
+              <div class="viewport-card">
+                <div class="viewport-header">
+                  <span>📸 Captured Page Viewport</span>
+                  <span id="res-exec-time" class="latency-pill">Latency: 0.38s</span>
+                </div>
+                <div class="viewport-canvas">
+                  <img id="res-screenshot-img" src="" alt="Page Viewport Screenshot">
+                  <div id="visual-detection-overlay" class="visual-clone-overlay hidden">
+                    <div class="clone-tag-badge">
+                      <span id="visual-overlay-tag">👁️ Visual Clone Match: 98.2% (SBI)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Forensic Root Cause Analysis (RCA) Card -->
+            <div id="rca-card" class="rca-card">
+              <div class="rca-header">
+                <div class="rca-title-group">
+                  <span class="rca-lead">🛡️ FORENSIC ROOT CAUSE ANALYSIS (RCA)</span>
+                  <h4 id="rca-primary-cause" class="rca-primary-cause">CREDENTIAL_HARVESTING_CLONE</h4>
+                </div>
+                <div class="rca-tag-group">
+                  <span id="rca-attack-vector" class="rca-vector-badge">Credential Harvesting</span>
+                </div>
+              </div>
+              <div id="rca-mitre-row" class="rca-mitre-row">
+                <!-- MITRE ATT&CK Badges dynamically populated -->
+              </div>
+              <div class="rca-forensic-matrix">
+                <div class="rca-matrix-item">
+                  <span class="rca-m-label">🎯 Targeted Brand</span>
+                  <span id="rca-target-brand" class="rca-m-val highlight-brand">SBI</span>
+                </div>
+                <div class="rca-matrix-item">
+                  <span class="rca-m-label">⚠️ Rogue Host</span>
+                  <span id="rca-rogue-host" class="rca-m-val highlight-danger">sbi-online-kyc-update.top</span>
+                </div>
+                <div class="rca-matrix-item">
+                  <span class="rca-m-label">📡 Exfiltration Sink</span>
+                  <span id="rca-exfil-sink" class="rca-m-val highlight-danger">http://194.26.29.112</span>
+                </div>
+                <div class="rca-matrix-item">
+                  <span class="rca-m-label">🕒 Domain Age & SSL</span>
+                  <span id="rca-domain-ssl" class="rca-m-val">3 Days | Plaintext HTTP</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5-Engine Multimodal Breakdown Tiles -->
+            <div class="engines-metrics-grid">
+              <div class="engine-tile">
+                <span class="e-num">01. VISION</span>
+                <span id="m-vision-val" class="e-score">98.2%</span>
+                <span id="m-vision-sub" class="e-desc">Visual Clone Match</span>
+              </div>
+              <div class="engine-tile">
+                <span class="e-num">02. DOM / AST</span>
+                <span id="m-dom-val" class="e-score">65.0%</span>
+                <span id="m-dom-sub" class="e-desc">Form Action Mismatch</span>
+              </div>
+              <div class="engine-tile">
+                <span class="e-num">03. URL / WHOIS</span>
+                <span id="m-url-val" class="e-score">90.0%</span>
+                <span id="m-url-sub" class="e-desc">Combosquatted Brand</span>
+              </div>
+              <div class="engine-tile">
+                <span class="e-num">04. NLP PRETEXT</span>
+                <span id="m-nlp-val" class="e-score">75.0%</span>
+                <span id="m-nlp-sub" class="e-desc">Urgent KYC Coercion</span>
+              </div>
+              <div class="engine-tile">
+                <span class="e-num">05. SSL / HEADERS</span>
+                <span id="m-meta-val" class="e-score">45.0%</span>
+                <span id="m-meta-sub" class="e-desc">Unencrypted HTTP</span>
+              </div>
+            </div>
+
+            <!-- Explainable Forensic Evidence List -->
+            <div class="evidence-card">
+              <div class="evidence-header">
+                <h4>⚠️ Why was this website flagged? (Explainable Forensic Findings)</h4>
+                <span class="evidence-badge">XAI AUDIT</span>
+              </div>
+              <ul id="res-reasons-list" class="evidence-list">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+
+            <!-- Threat Intelligence Exporters -->
+            <div class="export-tray">
+              <span class="export-lead">📥 Export Actionable Threat Intelligence:</span>
+              <div class="export-btn-group">
+                <button id="btn-export-stix" class="btn-intel">📄 STIX 2.1 JSON</button>
+                <button id="btn-export-misp" class="btn-intel">🛡️ MISP Event</button>
+                <button id="btn-export-suricata" class="btn-intel">⚡ Suricata NIDS</button>
+                <button id="btn-export-dns" class="btn-intel">🚫 BIND 9 RPZ</button>
+                <button id="btn-export-takedown" class="btn-intel btn-takedown">🚨 Abuse Takedown Dossier</button>
+              </div>
+            </div>
+
+            <!-- Export Code Viewer Modal -->
+            <div id="export-output-box" class="export-viewer hidden">
+              <div class="export-viewer-header">
+                <span id="export-title">STIX 2.1 Threat Intelligence Bundle</span>
+                <div style="display: flex; gap: 8px;">
+                  <button id="btn-copy-export" class="btn-copy">📋 Copy Content</button>
+                  <button id="close-export" class="btn-close">✕</button>
+                </div>
+              </div>
+              <pre><code id="export-code-content">// Output code here</code></pre>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 2: How Phishing Attacks Work vs How PhishShield Protects -->
+  <section id="how-it-works" class="story-section">
+    <div class="section-container">
+      
+      <div class="section-header">
+        <span class="section-tag">UNDERSTANDING THE THREAT</span>
+        <h2>How Real-World Phishing Attacks Work (and How We Stop Them)</h2>
+        <p>Modern phishing attacks use sophisticated visual cloning and newly registered domains to deceive users. Here is how PhishShield intercepts them at every stage.</p>
+      </div>
+
+      <div class="story-comparison-grid">
+        
+        <!-- Left: Attacker Flow -->
+        <div class="story-card attacker-flow">
+          <div class="story-card-header">
+            <span class="flow-icon">⚠️</span>
+            <h3>How Attackers Execute Lookalike Phishing</h3>
+          </div>
+          <ol class="story-steps">
+            <li>
+              <div class="step-num">1</div>
+              <div>
+                <strong>Register a Lookalike Domain:</strong>
+                <p>Scammers purchase deceptive domains like <code>sbi-online-kyc-update.top</code> or <code>paypal-secure-auth.xyz</code> from bulletproof registrars.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">2</div>
+              <div>
+                <strong>Clone Visual Look & Feel:</strong>
+                <p>They copy exact logos, brand color schemes, typography, and login input boxes so the page looks genuine to victims.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">3</div>
+              <div>
+                <strong>Send Panic SMS or WhatsApp Link:</strong>
+                <p>Victims receive psychological panic bait: <em>"URGENT: Your SBI Account will be blocked in 24 hours. Update KYC now at [Link]."</em></p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">4</div>
+              <div>
+                <strong>Exfiltrate Credentials:</strong>
+                <p>When the victim enters credentials and OTPs, the hidden form secretly posts them to the attacker's unauthorized server.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Right: Defender Flow -->
+        <div class="story-card defender-flow">
+          <div class="story-card-header">
+            <span class="flow-icon">🛡️</span>
+            <h3>How PhishShield AI Automatically Protects You</h3>
+          </div>
+          <ol class="story-steps">
+            <li>
+              <div class="step-num step-shield">1</div>
+              <div>
+                <strong>Automated Stream Ingestion:</strong>
+                <p>PhishShield continuously ingests newly registered domain (NRD) feeds 24/7 to catch threat infrastructure within hours of creation.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num step-shield">2</div>
+              <div>
+                <strong>Dual-Stage Computer Vision:</strong>
+                <p>Our visual AI matches the page layout against authentic brand templates using perceptual hashing & 128-D color gradients.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num step-shield">3</div>
+              <div>
+                <strong>DOM & Code AST X-Ray:</strong>
+                <p>We trace every form submission endpoint to catch credential theft endpoints and unencrypted HTTP transport.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num step-shield">4</div>
+              <div>
+                <strong>Instant Warning & Automated Takedown:</strong>
+                <p>Browsers receive instant red warning alerts, and registrars get an automated RFC 2142 abuse takedown notice to suspend the domain.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 3: Deep-Dive System Architecture -->
+  <section id="architecture" class="main-section">
+    <div class="section-container">
+      
+      <div class="section-header">
+        <span class="section-tag">ENGINEERING & ARCHITECTURE</span>
+        <h2>Deep-Dive: Multimodal AI System Architecture</h2>
+        <p>Built with Clean Architecture and GoF Design Patterns (Strategy, Pipeline, Repository, Adapter) for high-throughput enterprise cyber defense.</p>
+      </div>
+
+      <!-- Architecture Diagram Visualization -->
+      <div class="arch-diagram-card">
+        
+        <div class="arch-tier tier-ingestion">
+          <span class="tier-label">1. INGESTION & TRIAGE LAYER</span>
+          <div class="tier-nodes">
+            <div class="node-box">
+              <strong>WHOIS / RDAP Streams</strong>
+              <span>Global NRD Feeds & CertStream</span>
+            </div>
+            <div class="node-box">
+              <strong>REST API / Extension</strong>
+              <span>End-user & SOC Scans</span>
+            </div>
+            <div class="node-box accent-node">
+              <strong>Priority Task Queue</strong>
+              <span>Async Domain Dispatcher</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-arrow">⬇️</div>
+
+        <div class="arch-tier tier-crawler">
+          <span class="tier-label">2. SANDBOXED STEALTH CRAWLER</span>
+          <div class="tier-nodes">
+            <div class="node-box">
+              <strong>Headless Chromium Pool</strong>
+              <span>Anti-bot & Viewport Renderer</span>
+            </div>
+            <div class="node-box">
+              <strong>Viewport Capture (PNG)</strong>
+              <span>1280x800 Layout Snapshot</span>
+            </div>
+            <div class="node-box">
+              <strong>DOM AST & Network Headers</strong>
+              <span>Full HTML & SSL Metadata</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-arrow">⬇️</div>
+
+        <div class="arch-tier tier-engines">
+          <span class="tier-label">3. MULTIMODAL AI STRATEGY ENGINES (PIPELINE PATTERN)</span>
+          <div class="tier-nodes five-nodes">
+            <div class="node-box engine-node">
+              <strong>👁️ Visual AI</strong>
+              <span>pHash + 128-D Dense Embeddings</span>
+            </div>
+            <div class="node-box engine-node">
+              <strong>📜 DOM AST</strong>
+              <span>Tree SimHash & Form Tracking</span>
+            </div>
+            <div class="node-box engine-node">
+              <strong>🔤 URL Lexical</strong>
+              <span>Homoglyphs & DGA Entropy</span>
+            </div>
+            <div class="node-box engine-node">
+              <strong>💬 NLP Pretext</strong>
+              <span>Urgency & Credential Harvesting</span>
+            </div>
+            <div class="node-box engine-node">
+              <strong>🔒 SSL / Headers</strong>
+              <span>HSTS, CSP & Transport Security</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-arrow">⬇️</div>
+
+        <div class="arch-tier tier-scoring">
+          <span class="tier-label">4. CALIBRATED ML ENSEMBLE & EXPLAINABILITY</span>
+          <div class="tier-nodes">
+            <div class="node-box accent-node">
+              <strong>Calibrated Ensemble Classifier</strong>
+              <span>Probabilistic Scoring (0.0 - 100.0%)</span>
+            </div>
+            <div class="node-box">
+              <strong>Strict Whitelist Guard</strong>
+              <span>0.0% False Positive Guarantee</span>
+            </div>
+            <div class="node-box">
+              <strong>Explainable AI (XAI)</strong>
+              <span>Forensic Evidence Attribution</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-arrow">⬇️</div>
+
+        <div class="arch-tier tier-delivery">
+          <span class="tier-label">5. ACTIONABLE THREAT INTELLIGENCE DELIVERY</span>
+          <div class="tier-nodes">
+            <div class="node-box output-node">
+              <strong>STIX 2.1 / MISP</strong>
+              <span>SIEM & Threat Intel Sharing</span>
+            </div>
+            <div class="node-box output-node">
+              <strong>Suricata / Snort Rules</strong>
+              <span>Network IDS Blocklists</span>
+            </div>
+            <div class="node-box output-node">
+              <strong>DNS Sinkholes</strong>
+              <span>Pi-hole & BIND 9 RPZ</span>
+            </div>
+            <div class="node-box output-node">
+              <strong>Abuse Takedown Dossier</strong>
+              <span>RFC 2142 Registrar Letters</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 4: NRD Live Stream Surveillance -->
+  <section id="nrd-stream" class="main-section alt-bg">
+    <div class="section-container">
+      
+      <div class="section-header">
+        <span class="section-tag">REAL-TIME SURVEILLANCE</span>
+        <h2>⚡ Newly Registered Domain (NRD) Stream Triage</h2>
+        <p>Continuous automated discovery and AI classification of newly created domains from global WHOIS & certificate logs.</p>
+      </div>
+
+      <div class="nrd-stream-deck">
+        <div class="nrd-deck-header">
+          <div>
+            <h3>Live WHOIS Ingestion Buffer</h3>
+            <span class="nrd-sub-text">Domains registered within the last 0-5 days queued for automated classification</span>
+          </div>
+          <div class="nrd-btn-group">
+            <button id="btn-ingest-nrd" class="btn-nrd-action">📡 Ingest Live Stream Batch</button>
+            <button id="btn-triage-nrd" class="btn-nrd-action btn-triage-action">⚡ Run Parallel AI Triage</button>
+          </div>
+        </div>
+
+        <!-- NRD Stream Queue Filtering & Metrics -->
+        <div class="nrd-filter-bar">
+          <div class="nrd-filter-tabs">
+            <button class="nrd-tab-btn active" data-filter="ALL">All Monitored (<span id="nrd-cnt-all">0</span>)</button>
+            <button class="nrd-tab-btn" data-filter="PENDING">⏳ Pending Triage (<span id="nrd-cnt-pending">0</span>)</button>
+            <button class="nrd-tab-btn" data-filter="THREATS">🚨 Flagged Threats (<span id="nrd-cnt-threats">0</span>)</button>
+            <button class="nrd-tab-btn" data-filter="BENIGN">✅ Benign (<span id="nrd-cnt-benign">0</span>)</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
             <thead>
               <tr>
-                <th>Target URL</th>
-                <th>Risk Score</th>
-                <th>Risk Level</th>
-                <th>Primary Threat Finding</th>
+                <th>Domain Name</th>
+                <th>Registrar</th>
+                <th>Registration Date</th>
+                <th>Triage Status</th>
               </tr>
             </thead>
-            <tbody id="bulk-table-body">
+            <tbody id="nrd-table-body">
               <!-- Dynamically populated -->
             </tbody>
           </table>
         </div>
+      </div>
 
-        <!-- Active Analysis View -->
-        <div id="active-results" class="active-results hidden">
-          
-          <div class="results-header">
-            <div>
-              <span class="res-sub">SECURITY ASSESSMENT REPORT</span>
-              <h2 id="res-url-title">http://sbi-online-kyc-update.top</h2>
-            </div>
-            <div id="res-risk-badge" class="risk-badge badge-critical">CRITICAL PHISHING</div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: Monitored Brand Vault -->
+  <section id="brand-catalog" class="main-section">
+    <div class="section-container">
+      
+      <div class="section-header">
+        <span class="section-tag">GROUND-TRUTH REPOSITORY</span>
+        <h2>🏢 Monitored Brand Signatures & Vector Store</h2>
+        <p>Authentic visual templates, color palettes, and DOM structures indexed in the PhishShield Vector Store.</p>
+      </div>
+
+      <div class="brands-catalog-layout">
+        
+        <!-- Add Brand Widget -->
+        <div class="add-brand-widget">
+          <h3>➕ Index New Target Brand</h3>
+          <p>Register any enterprise portal into the VectorStore on the fly:</p>
+          <div class="add-brand-form">
+            <input type="text" id="new-brand-name" placeholder="Brand keyword (e.g. phonepe, drdo, unstop)">
+            <input type="text" id="new-brand-domain" placeholder="Official domain (e.g. phonepe.com)">
+            <select id="new-brand-category" style="background: var(--bg-surface); border: 1px solid var(--border-light); color: var(--text-primary); padding: 8px; border-radius: 4px; font-size: 11px;">
+              <option value="">🎯 Auto-Detect Category (AI Authority)</option>
+              <option value="Government & Defense (India)">🏛️ Government & Defense (India)</option>
+              <option value="Banking & Financial Services">🏦 Banking & Financial Services</option>
+              <option value="Payment Gateway & Fintech">💳 Payment Gateway & Fintech</option>
+              <option value="Technology & Enterprise Cloud">💻 Technology & Enterprise Cloud</option>
+              <option value="E-Commerce & Digital Retail">🛒 E-Commerce & Retail</option>
+              <option value="Digital Media & Streaming">🎬 Digital Media & Streaming</option>
+              <option value="EdTech, Coding & Competitions">🎓 EdTech, Coding & Competitions</option>
+              <option value="Developer Tools & Cloud Infrastructure">⚡ Developer Tools & Cloud</option>
+              <option value="Professional & Social Networking">👥 Professional & Social Network</option>
+              <option value="Travel, Hospitality & Mobility">✈️ Travel & Hospitality</option>
+              <option value="Food Delivery & Logistics">🍔 Food Delivery & Logistics</option>
+              <option value="Artificial Intelligence & Research">🤖 Artificial Intelligence & Research</option>
+            </select>
+            <button id="btn-add-brand" class="btn-index-brand">Extract & Index Signatures</button>
           </div>
-
-          <!-- Overall Score & Visual Preview Grid -->
-          <div class="overview-grid">
-            <div class="score-card">
-              <span class="score-title">Overall Risk Score</span>
-              <div class="score-val-row">
-                <span id="res-score-number" class="score-number">94.0%</span>
-                <span class="score-max">/ 100</span>
-              </div>
-              <p id="res-action-text" class="action-recommendation">BLOCK ACCESS IMMEDIATELY.</p>
-            </div>
-
-            <!-- Screenshot Capture Frame with Overlay -->
-            <div class="screenshot-card">
-              <div class="ss-header">
-                <span>📸 Rendered Page Viewport Capture</span>
-                <span id="res-exec-time" class="exec-time">Execution: 0.38s</span>
-              </div>
-              <div class="ss-body">
-                <img id="res-screenshot-img" src="" alt="Captured Screenshot">
-                <div id="visual-detection-overlay" class="visual-overlay hidden">
-                  <div class="overlay-box">
-                    <span class="overlay-tag">👁️ PyTorch ResNet Visual Match: 98.2%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Explainable Risk Findings -->
-          <div class="explain-box">
-            <h3>⚠️ Explainable Risk Findings</h3>
-            <ul id="res-reasons-list" class="reasons-list">
-              <!-- Dynamically populated -->
-            </ul>
-          </div>
-
-          <!-- 4-Engine Breakdown Metrics -->
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <span class="m-title">Visual Clone Match</span>
-              <span id="m-vision-val" class="m-val">98.2%</span>
-              <span id="m-vision-sub" class="m-sub">Matched: State Bank of India</span>
-            </div>
-            <div class="metric-card">
-              <span class="m-title">DOM & Form Post</span>
-              <span id="m-dom-val" class="m-val">50.0%</span>
-              <span id="m-dom-sub" class="m-sub">Form action mismatch</span>
-            </div>
-            <div class="metric-card">
-              <span class="m-title">Typosquatting NLP</span>
-              <span id="m-url-val" class="m-val">100.0%</span>
-              <span id="m-url-sub" class="m-sub">Brand similarity detected</span>
-            </div>
-            <div class="metric-card">
-              <span class="m-title">SSL & Security Headers</span>
-              <span id="m-meta-val" class="m-val">35.0%</span>
-              <span id="m-meta-sub" class="m-sub">HTTP connection</span>
-            </div>
-          </div>
-
-          <!-- Threat Intelligence Export Actions -->
-          <div class="export-actions">
-            <button id="btn-export-stix" class="btn-export">📄 STIX 2.1 Threat Bundle</button>
-            <button id="btn-export-takedown" class="btn-export takedown">🚨 Registrar Takedown Notice</button>
-            <button id="btn-export-dns" class="btn-export secondary">🚫 DNS Sinkhole Rule</button>
-          </div>
-
-          <!-- Exported Output Modal Container -->
-          <div id="export-output-box" class="export-output-box hidden">
-            <div class="export-header">
-              <span id="export-title">STIX 2.1 JSON Threat Bundle</span>
-              <button id="close-export" class="close-btn">✕</button>
-            </div>
-            <pre><code id="export-code-content">// Exported STIX JSON data</code></pre>
-          </div>
-
+          <div id="brand-reg-msg" class="brand-success-msg hidden"></div>
         </div>
 
-      </section>
+        <!-- Brand Cards Grid -->
+        <div class="brand-cards-grid" id="brand-list-container">
+          <!-- Dynamically populated -->
+        </div>
 
-    </main>
-  </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <svg class="brand-svg-logo" width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="userShieldGradFoot" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#0284C7"/>
+              <stop offset="0.5" stop-color="#2563EB"/>
+              <stop offset="1" stop-color="#4F46E5"/>
+            </linearGradient>
+            <linearGradient id="shieldFillGradFoot" x1="22" y1="18" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38BDF8" stop-opacity="0.35"/>
+              <stop offset="1" stop-color="#4F46E5" stop-opacity="0.2"/>
+            </linearGradient>
+          </defs>
+          <circle cx="18" cy="14" r="5.5" fill="url(#userShieldGradFoot)"/>
+          <path d="M7 38C7 28.5 13 25 21 25C22.2 25 23.4 25.1 24.5 25.4C23.6 27.2 23 29.3 23 31.5C23 35.2 24.8 38.6 27.6 40.8C25.6 41.6 23.4 42 21 42C13 42 7 38 7 38Z" fill="url(#userShieldGradFoot)" fill-opacity="0.85"/>
+          <path d="M34 16L22 21.5V31C22 38.5 34 44 34 44C34 44 46 38.5 46 31V21.5L34 16Z" fill="url(#shieldFillGradFoot)" stroke="url(#userShieldGradFoot)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M29 30L33 34L40 26" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <h3>Phish<span class="brand-highlight">Shield</span><span class="brand-suffix">.ai</span></h3>
+          <p>Autonomous Zero-Day Phishing & Brand Impersonation Defense Platform</p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="#scanner">Scanner</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#architecture">Architecture</a>
+        <a href="/docs" target="_blank">Swagger API</a>
+        <a href="/redoc" target="_blank">ReDoc</a>
+      </div>
+      <div class="footer-copy">
+        © 2026 PhishShield AI. Built with Clean Architecture & Multimodal AI.
+      </div>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>

@@ -23,7 +23,7 @@ function autoScanPage() {
     const level = assessment.risk_level;
     const score = assessment.overall_score || 0;
 
-    if (level === "CRITICAL PHISHING" || level === "SUSPICIOUS") {
+    if (level === "CRITICAL PHISHING" || level === "HIGH PHISHING" || level === "SUSPICIOUS") {
       injectWarningBanner(level, score, assessment.explainable_reasons || []);
     }
   })

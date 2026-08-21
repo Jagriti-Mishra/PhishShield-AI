@@ -2,30 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PhishShield AI Badge</title>
+  <title>PhishShield AI Guard</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="card">
     <div class="header">
       <div class="logo-title">
-        <span class="shield-icon">🛡️</span>
+        <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="extShieldGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38BDF8"/>
+              <stop offset="0.5" stop-color="#2563EB"/>
+              <stop offset="1" stop-color="#6366F1"/>
+            </linearGradient>
+            <linearGradient id="extShieldFill" x1="22" y1="18" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38BDF8" stop-opacity="0.35"/>
+              <stop offset="1" stop-color="#6366F1" stop-opacity="0.2"/>
+            </linearGradient>
+          </defs>
+          <circle cx="18" cy="14" r="5.5" fill="url(#extShieldGrad)"/>
+          <path d="M7 38C7 28.5 13 25 21 25C22.2 25 23.4 25.1 24.5 25.4C23.6 27.2 23 29.3 23 31.5C23 35.2 24.8 38.6 27.6 40.8C25.6 41.6 23.4 42 21 42C13 42 7 38 7 38Z" fill="url(#extShieldGrad)" fill-opacity="0.85"/>
+          <path d="M34 16L22 21.5V31C22 38.5 34 44 34 44C34 44 46 38.5 46 31V21.5L34 16Z" fill="url(#extShieldFill)" stroke="url(#extShieldGrad)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M29 30L33 34L40 26" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <div>
-          <h2>PhishShield AI</h2>
-          <p class="subtitle">SIH 1454 Security Guard</p>
+          <h2>Phish<span style="color: #38bdf8;">Shield</span><span style="color: #818cf8; font-size: 11px;">.ai</span></h2>
+          <p class="subtitle">Autonomous Phishing Guard</p>
         </div>
       </div>
       <span id="badge-pill" class="badge badge-safe">SAFE</span>
     </div>
 
     <div class="url-box">
-      <span class="url-label">ACTIVE TAB URL:</span>
+      <span class="url-label">ACTIVE TAB:</span>
       <div id="current-url" class="url-text">Loading...</div>
     </div>
 
     <div class="risk-gauge-container">
       <div class="risk-header">
-        <span>AI Risk Assessment</span>
+        <span>Multimodal AI Risk Assessment</span>
         <span id="risk-score-value">0%</span>
       </div>
       <div class="progress-bar">
@@ -35,33 +51,33 @@
 
     <div class="breakdown-grid">
       <div class="breakdown-item">
-        <span class="b-label">Visual Match</span>
+        <span class="b-label">Visual AI</span>
         <span id="b-vision" class="b-val">0%</span>
       </div>
       <div class="breakdown-item">
-        <span class="b-label">DOM & Code</span>
+        <span class="b-label">DOM & AST</span>
         <span id="b-dom" class="b-val">0%</span>
       </div>
       <div class="breakdown-item">
-        <span class="b-label">Typosquatting</span>
+        <span class="b-label">URL & WHOIS</span>
         <span id="b-url" class="b-val">0%</span>
       </div>
       <div class="breakdown-item">
-        <span class="b-label">SSL & Metadata</span>
-        <span id="b-meta" class="b-val">0%</span>
+        <span class="b-label">NLP Pretext</span>
+        <span id="b-nlp" class="b-val">0%</span>
       </div>
     </div>
 
     <div class="reasons-section">
-      <h3>Explainable Risk Findings:</h3>
+      <h3>Explainable Forensic Evidence:</h3>
       <ul id="reasons-list">
-        <li class="empty-msg">Scanning website URL and layout...</li>
+        <li class="empty-msg">Scanning active tab URL and visual layout...</li>
       </ul>
     </div>
 
     <div class="actions">
       <button id="scan-btn" class="btn btn-primary">🔄 Re-Scan Page</button>
-      <button id="dashboard-btn" class="btn btn-secondary">📊 Open SOC Dashboard</button>
+      <button id="dashboard-btn" class="btn btn-secondary">📊 Open SOC Operations</button>
     </div>
   </div>
 

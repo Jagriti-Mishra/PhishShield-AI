@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const bVision = document.getElementById("b-vision");
   const bDom = document.getElementById("b-dom");
   const bUrl = document.getElementById("b-url");
-  const bMeta = document.getElementById("b-meta");
+  const bNlp = document.getElementById("b-nlp");
   const reasonsList = document.getElementById("reasons-list");
   const scanBtn = document.getElementById("scan-btn");
   const dashboardBtn = document.getElementById("dashboard-btn");
@@ -23,12 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const activeUrl = tabs[0].url;
       currentUrlEl.textContent = activeUrl;
-      reasonsList.innerHTML = "<li class='empty-msg'>Scanning URL & page visual layout...</li>";
+      reasonsList.innerHTML = "<li class='empty-msg'>Executing multimodal AI inspection...</li>";
 
       fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: activeUrl })
+        body: JSON.stringify({ url: activeUrl, deep_scan: true })
       })
       .then(res => res.json())
       .then(data => {
@@ -48,6 +48,10 @@ document.addEventListener("DOMContentLoaded", () => {
           badgePill.classList.add("badge-critical");
           badgePill.textContent = "CRITICAL";
           progressFill.classList.add("fill-critical");
+        } else if (level === "HIGH PHISHING") {
+          badgePill.classList.add("badge-critical");
+          badgePill.textContent = "HIGH RISK";
+          progressFill.classList.add("fill-critical");
         } else if (level === "SUSPICIOUS") {
           badgePill.classList.add("badge-warning");
           badgePill.textContent = "SUSPICIOUS";
@@ -60,21 +64,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Breakdown scores
         bVision.textContent = `${breakdown.vision?.score || 0}%`;
-        bDom.textContent = `${breakdown.dom?.score || 0}%`;
-        bUrl.textContent = `${breakdown.url?.score || 0}%`;
-        bMeta.textContent = `${breakdown.metadata?.score || 0}%`;
+        bDom.textContent = `${breakdown.dom_code?.score || 0}%`;
+        bUrl.textContent = `${breakdown.url_whois?.score || 0}%`;
+        bNlp.textContent = `${breakdown.nlp_pretext?.score || 0}%`;
 
         // Reasons
         const reasons = assessment.explainable_reasons || [];
         if (reasons.length === 0) {
-          reasonsList.innerHTML = "<li class='empty-msg'>✅ No security anomalies detected. Site appears legitimate.</li>";
+          reasonsList.innerHTML = "<li class='empty-msg'>✅ No security anomalies detected. Site is verified safe.</li>";
         } else {
           reasonsList.innerHTML = reasons.map(r => `<li>⚠️ ${r}</li>`).join("");
         }
       })
       .catch(err => {
         console.error("Scan error:", err);
-        reasonsList.innerHTML = "<li class='empty-msg'>❌ Unable to connect to PhishShield API Server (Is FastAPI backend running on port 8000?)</li>";
+        reasonsList.innerHTML = "<li class='empty-msg'>❌ Unable to connect to PhishShield Backend (Is FastAPI server running on port 8000?)</li>";
       });
     });
   }

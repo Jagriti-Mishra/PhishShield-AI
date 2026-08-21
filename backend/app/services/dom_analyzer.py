@@ -1,32 +1,56 @@
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+from typing import Dict, Any, List
 
-class DOMAnalyzer:
-    def analyze(self, html_content: str, page_url: str) -> dict:
+from app.services.base import BaseAnalyzer, AnalysisContext, AnalysisResult
+from app.db.vector_store import VectorStore
+from app.core.config import settings
+
+class DOMAnalyzer(BaseAnalyzer):
+    def __init__(self, vector_store: VectorStore):
+        self.vector_store = vector_store
+
+    @staticmethod
+    def compute_dom_structure_hash(soup: BeautifulSoup) -> str:
+        """Extracts top tag hierarchy sequence to fingerprint DOM structure."""
+        tags = [tag.name for tag in soup.find_all() if tag.name not in ["script", "style", "meta", "link"]]
+        tag_str = "-".join(tags[:60])
+        return tag_str
+
+    def analyze(self, context: AnalysisContext) -> AnalysisResult:
+        if context.is_official_brand:
+            return AnalysisResult(
+                engine_name="DOM_CODE",
+                score=0.0,
+                weight=settings.WEIGHT_DOM_CODE,
+                reasons=[],
+                details={"form_action_mismatch": False, "is_official": True}
+            )
+
+        html_content = context.html_content
         if not html_content:
-            return {
-                "score": 0.0,
-                "form_action_mismatch": False,
-                "password_field_present": False,
-                "insecure_password_post": False,
-                "js_obfuscation_detected": False,
-                "asset_theft_detected": False,
-                "reasons": []
-            }
+            return AnalysisResult(
+                engine_name="DOM_CODE",
+                score=0.0,
+                weight=settings.WEIGHT_DOM_CODE,
+                reasons=["No HTML source content retrieved for DOM tree inspection"],
+                details={"html_empty": True}
+            )
 
         soup = BeautifulSoup(html_content, "html.parser")
-        parsed_page = urlparse(page_url if "://" in page_url else f"http://{page_url}")
-        page_host = parsed_page.netloc.split(":")[0].lower()
+        page_host = context.domain.lower()
 
         score = 0.0
         reasons = []
-        
-        # 1. Form Action Destination Check
+        details = {}
+
+        # 1. Form Action Destination & Credential Exfiltration Check
         forms = soup.find_all("form")
-        form_action_mismatch = False
+        form_mismatch_detected = False
         insecure_password_post = False
-        has_password = False
+        has_password_field = False
+        external_action_endpoints = []
 
         for form in forms:
             action = form.get("action", "").strip()
@@ -34,80 +58,102 @@ class DOMAnalyzer:
             
             contains_pass = any(i.get("type", "").lower() == "password" for i in inputs)
             if contains_pass:
-                has_password = True
+                has_password_field = True
 
             if action:
                 parsed_action = urlparse(action)
                 action_host = parsed_action.netloc.split(":")[0].lower()
                 
-                # Check if form action posts to different external host or raw IP
+                # Check if form action targets an external domain or raw IP
                 if action_host and action_host != page_host and not action_host.endswith(f".{page_host}"):
-                    form_action_mismatch = True
+                    form_mismatch_detected = True
+                    external_action_endpoints.append(action_host)
+                    
                     if contains_pass:
                         insecure_password_post = True
-                        score += 50.0
-                        reasons.append(f"CRITICAL: Login form posts credentials to external host '{action_host}'")
+                        score += 65.0
+                        reasons.append(f"CRITICAL Credential Exfiltration: Login form posts passwords to unauthorized external host '{action_host}'")
                     else:
-                        score += 30.0
-                        reasons.append(f"Form action posts data to external host '{action_host}'")
+                        score += 35.0
+                        reasons.append(f"Suspicious Form Action: Form submits user data to external host '{action_host}'")
                 elif parsed_action.scheme == "http" and contains_pass:
                     insecure_password_post = True
-                    score += 40.0
-                    reasons.append("Password input form submits over unencrypted HTTP protocol")
+                    score += 45.0
+                    reasons.append("Insecure Authentication: Password form submits credentials over unencrypted plain HTTP")
 
-        # 2. Obfuscated JavaScript Detection
+        details["form_action_mismatch"] = form_mismatch_detected
+        details["insecure_password_post"] = insecure_password_post
+        details["has_password_field"] = has_password_field
+        details["external_action_endpoints"] = external_action_endpoints
+
+        # 2. JavaScript AST Obfuscation, Anti-Analysis & AitM Evasion Techniques
         scripts = soup.find_all("script")
-        js_obfuscation = False
+        js_obfuscation_detected = False
         obfuscation_patterns = [
-            r"eval\s*\(\s*function",
-            r"unescape\s*\(",
-            r"\\x[0-9a-fA-F]{2}",
-            r"String\.fromCharCode",
-            r"document\[['\"]write['\"]\]"
+            (r"eval\s*\(\s*function", "Dynamic eval() unpacking"),
+            (r"unescape\s*\(", "Obsolete unescape() decoding"),
+            (r"\\x[0-9a-fA-F]{2}", "Hex-encoded string array literals"),
+            (r"_0x[a-fA-F0-9]{4,}", "Polymorphic obfuscated variable mangling"),
+            (r"String\.fromCharCode", "CharCode obfuscated strings"),
+            (r"document\[['\"]write['\"]\]", "Dynamically written DOM injection"),
+            (r"atob\s*\(", "Base64 payload execution"),
+            (r"navigator\.webdriver", "Anti-Analysis: Headless browser & sandbox evasion"),
+            (r"debugger\s*;", "Anti-Forensics: Anti-debugging execution trap"),
+            (r"setInterval\s*\(\s*function\s*\(\s*\)\s*\{\s*debugger", "Continuous DevTools killer loop"),
+            (r"window\.location\.replace", "Immediate client-side redirect"),
+            (r"document\.cookie", "Session Token / Cookie Exfiltration Attempt")
         ]
 
+        found_js_tricks = []
         for s in scripts:
             js_text = s.string or ""
-            for pat in obfuscation_patterns:
+            for pat, desc in obfuscation_patterns:
                 if re.search(pat, js_text):
-                    js_obfuscation = True
-                    break
-            if js_obfuscation:
-                break
+                    js_obfuscation_detected = True
+                    if desc not in found_js_tricks:
+                        found_js_tricks.append(desc)
 
-        if js_obfuscation:
-            score += 25.0
-            reasons.append("Obfuscated or dynamically evaluated JavaScript code detected")
+        details["js_obfuscation_detected"] = js_obfuscation_detected
+        details["obfuscation_techniques"] = found_js_tricks
+        if js_obfuscation_detected:
+            score += min(45.0, len(found_js_tricks) * 15.0)
+            reasons.append(f"Adversarial / Evasive JavaScript Detected: {', '.join(found_js_tricks[:3])}")
 
-        # 3. Asset Theft Detection (Fetching brand logos from official CDNs on unofficial domain)
-        images = soup.find_all(["img", "link"])
-        asset_theft = False
-        trusted_cdns = ["paypal.com", "sbi.co.in", "hdfcbank.com", "google.com", "microsoft.com", "apple.com"]
+        # 3. Brand Asset Leeching / Hotlinking from Official CDNs
+        all_official_domains = self.vector_store.get_all_official_domains()
+        images_and_links = soup.find_all(["img", "link", "script"])
+        hotlinked_brands = []
 
-        for img in images:
-            src = img.get("src") or img.get("href") or ""
+        for elem in images_and_links:
+            src = elem.get("src") or elem.get("href") or ""
             if "://" in src:
-                img_host = urlparse(src).netloc.split(":")[0].lower()
-                if img_host and img_host != page_host:
-                    for cdn in trusted_cdns:
-                        if cdn in img_host and cdn not in page_host:
-                            asset_theft = True
-                            break
-            if asset_theft:
-                break
+                src_host = urlparse(src).netloc.split(":")[0].lower()
+                for off_dom, brand in all_official_domains.items():
+                    if (src_host == off_dom or src_host.endswith(f".{off_dom}")) and (page_host != off_dom and not page_host.endswith(f".{off_dom}")):
+                        if brand not in hotlinked_brands:
+                            hotlinked_brands.append(brand)
 
-        if asset_theft:
-            score += 30.0
-            reasons.append("Hotlinking / Asset theft: Stolen brand logos loaded directly from official brand servers")
+        details["asset_theft_detected"] = bool(hotlinked_brands)
+        details["hotlinked_brands"] = hotlinked_brands
+        if hotlinked_brands:
+            score += 40.0
+            reasons.append(f"Brand Asset Leeching: Page hotlinks authentic logos/styles directly from official servers of: {', '.join(hotlinked_brands)}")
 
-        score = min(100.0, score)
+        # 4. Anti-Analysis / Right-Click & DevTools Blocker Detection
+        raw_html_lower = html_content.lower()
+        anti_analysis_detected = False
+        if any(term in raw_html_lower for term in ["event.keycode == 123", "event.keycode==123", "oncontextmenu=\"return false\"", "onselectstart=\"return false\"", "debugger"]):
+            anti_analysis_detected = True
+            score += 25.0
+            reasons.append("Anti-Forensic Code: Page disables right-click context menu and keyboard DevTools (F12) inspection")
 
-        return {
-            "score": round(score, 2),
-            "form_action_mismatch": form_action_mismatch,
-            "password_field_present": has_password,
-            "insecure_password_post": insecure_password_post,
-            "js_obfuscation_detected": js_obfuscation,
-            "asset_theft_detected": asset_theft,
-            "reasons": reasons
-        }
+        details["anti_analysis_detected"] = anti_analysis_detected
+
+        final_score = min(100.0, round(score, 2))
+        return AnalysisResult(
+            engine_name="DOM_CODE",
+            score=final_score,
+            weight=settings.WEIGHT_DOM_CODE,
+            reasons=reasons,
+            details=details
+        )

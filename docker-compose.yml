@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  phishshield-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phishshield_soc_server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PROJECT_NAME=PhishShield AI — Enterprise Multimodal Phishing Detector
+      - VERSION=2.0.0
+      - DEBUG=False
+      - CRAWLER_TIMEOUT_SECONDS=8
+      - CRITICAL_RISK_THRESHOLD=70.0
+      - HIGH_RISK_THRESHOLD=55.0
+      - SUSPICIOUS_RISK_THRESHOLD=35.0
+      - VISUAL_CLONE_THRESHOLD=0.72
+    volumes:
+      - phishshield_data:/app/backend/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  phishshield_data:
+    driver: local

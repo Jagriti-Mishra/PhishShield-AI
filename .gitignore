@@ -21,15 +21,30 @@ wheels/
 *.egg
 
 # Virtual Environments
+.venv/
 venv/
 env/
 ENV/
 
-# Dynamic Captures & Temp Data
+# Testing & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Dynamic Captures & Databases
+backend/app/data/captures/*.png
+!backend/app/data/captures/.gitkeep
+backend/app/data/*.db
+backend/app/data/*.sqlite
 backend/data/captures/*.png
 !backend/data/captures/.gitkeep
 scratch/
 *.log
+*.db
+*.sqlite3
+
+# Environment Secrets
+.env
 
 # Large Datasets
 problemStatements.xlsx

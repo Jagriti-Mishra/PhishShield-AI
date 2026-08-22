@@ -1619,6 +1619,28 @@ body {
   color: var(--text-dim);
 }
 
+.brand-success-msg {
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  margin-top: 10px;
+}
+
+.brand-error-msg {
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  margin-top: 10px;
+}
+
 .hidden {
   display: none !important;
 }

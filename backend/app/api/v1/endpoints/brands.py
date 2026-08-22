@@ -1,3 +1,4 @@
+import socket
 import tldextract
 from urllib.parse import urlparse
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -57,16 +58,8 @@ def lookup_brand(query: str):
 @router.post("/brands/add")
 def register_brand(req: BrandRegisterRequest, db: Session = Depends(get_db)):
     brand_clean = req.brand_name.strip().lower()
-    # Clean input: Extract FQDN even if user pastes full URL (e.g. https://unstop.com/practice/...)
-    raw_domain = req.official_domain.strip().lower()
-    if "://" in raw_domain:
-        parsed_u = urlparse(raw_domain)
-        domain_clean = parsed_u.netloc.split(":")[0].strip().lower()
-    else:
-        domain_clean = raw_domain.split("/")[0].split(":")[0].strip().lower()
-    
-    if domain_clean.startswith("www."):
-        domain_clean = domain_clean[4:]
+    # Clean input: Extract clean FQDN even if user pastes full URL (e.g. https://www.nasa.gov/ or https://flipkart.com/account/login)
+    domain_clean = BrandVerifier.clean_domain_string(req.official_domain)
 
     if not brand_clean or not domain_clean:
         raise HTTPException(
@@ -84,7 +77,8 @@ def register_brand(req: BrandRegisterRequest, db: Session = Depends(get_db)):
             detail=auth_err
         )
     
-    cat = req.category if req.category and req.category != "General" else (auth_meta.get("category") if auth_meta else "Enterprise & Cloud Services")
+    # Authoritative verified category strictly takes precedence over manual/stale dropdown
+    cat = (auth_meta.get("category") if auth_meta and auth_meta.get("category") else req.category) or "Enterprise & Cloud Services"
 
     # ------------------------------------------------------------------------
     # Guard 1: Domain Syntax & Combosquatting / Typosquat Screening
@@ -131,6 +125,20 @@ def register_brand(req: BrandRegisterRequest, db: Session = Depends(get_db)):
                 f"Phishing/lookalike domains cannot be registered as authorized brands."
             )
         )
+
+    # ------------------------------------------------------------------------
+    # Guard 1.5: Active DNS Host Existence Verification
+    # ------------------------------------------------------------------------
+    try:
+        socket.gethostbyname(domain_clean)
+    except socket.gaierror:
+        try:
+            socket.gethostbyname(candidate_root)
+        except socket.gaierror:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Registration Blocked: Domain '{domain_clean}' does not exist on global DNS (NXDOMAIN). Only live, active domains can be registered."
+            )
 
     # ------------------------------------------------------------------------
     # Guard 2: Root-Domain Heritage Guard for Existing Brands

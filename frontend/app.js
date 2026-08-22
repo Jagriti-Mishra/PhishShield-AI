@@ -535,18 +535,21 @@ document.addEventListener("DOMContentLoaded", () => {
   let brandLookupTimer = null;
 
   async function triggerBrandLookup(queryVal, sourceInput) {
-    if (!queryVal || queryVal.length < 2) return;
+    if (!queryVal || queryVal.length < 2) {
+      brandRegMsg.classList.add("hidden");
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/brands/lookup?query=${encodeURIComponent(queryVal)}`);
       if (res.ok) {
         const authData = await res.json();
-        if (authData) {
-          // If typed brand name, autofill domain
+        if (authData && authData.verified) {
+          // If typed brand keyword and it is a verified authority, autofill official domain
           if (sourceInput === "name" && authData.official_domain) {
             newBrandDomain.value = authData.official_domain;
           }
-          // If typed domain, autofill brand name
-          if (sourceInput === "domain" && authData.brand_name && !newBrandName.value) {
+          // If typed/pasted official domain, autofill official brand name
+          if (sourceInput === "domain" && authData.brand_name) {
             newBrandName.value = authData.brand_name;
           }
 
@@ -555,24 +558,59 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           brandRegMsg.className = "brand-success-msg";
-          const verifyBadge = authData.verified ? "🛡️ <strong>Recognized Official Authority:</strong>" : "🎯 <strong>Auto-Detected Target:</strong>";
-          brandRegMsg.innerHTML = `${verifyBadge} ${authData.canonical_name || authData.brand_name} &bull; Sector: <code>${authData.category}</code> &bull; Primary Domain: <code>${authData.official_domain}</code>`;
+          brandRegMsg.innerHTML = `🛡️ <strong>Recognized Official Authority:</strong> ${authData.canonical_name || authData.brand_name} &bull; Sector: <code>${authData.category}</code> &bull; Primary Domain: <code>${authData.official_domain}</code>`;
           brandRegMsg.classList.remove("hidden");
+          return;
         }
       }
-    } catch (e) {}
+
+      // Check if user entered a recognized brand name with an unofficial/fake domain
+      const bName = newBrandName.value.trim();
+      let bDom = newBrandDomain.value.trim().toLowerCase();
+      if (bDom.includes("://")) bDom = bDom.split("://")[1];
+      bDom = bDom.split("/")[0].split(":")[0];
+      if (bDom.startsWith("www.")) bDom = bDom.substring(4);
+
+      if (bName && bDom && bDom.includes(".")) {
+        const bRes = await fetch(`${API_BASE}/brands/lookup?query=${encodeURIComponent(bName)}`);
+        if (bRes.ok) {
+          const bData = await bRes.json();
+          if (bData && bData.official_domains && !bData.official_domains.some(d => bDom === d || bDom.endsWith(`.${d}`))) {
+            brandRegMsg.className = "brand-error-msg";
+            brandRegMsg.innerHTML = `⚠️ <strong>Unofficial Domain:</strong> <code>${bDom}</code> is NOT authorized for <strong>${bData.canonical_name}</strong> (Official: <code>${bData.official_domains.join(", ")}</code>).`;
+            brandRegMsg.classList.remove("hidden");
+            return;
+          }
+        }
+      }
+
+      brandRegMsg.classList.add("hidden");
+    } catch (e) {
+      brandRegMsg.classList.add("hidden");
+    }
   }
 
   newBrandName.addEventListener("input", () => {
     const val = newBrandName.value.trim();
+    if (!val) {
+      newBrandDomain.value = "";
+      if (newBrandCategory) newBrandCategory.selectedIndex = 0;
+      brandRegMsg.classList.add("hidden");
+      return;
+    }
     clearTimeout(brandLookupTimer);
-    brandLookupTimer = setTimeout(() => triggerBrandLookup(val, "name"), 250);
+    brandLookupTimer = setTimeout(() => triggerBrandLookup(val, "name"), 200);
   });
 
   newBrandDomain.addEventListener("input", () => {
     const val = newBrandDomain.value.trim();
+    if (!val) {
+      if (newBrandCategory) newBrandCategory.selectedIndex = 0;
+      brandRegMsg.classList.add("hidden");
+      return;
+    }
     clearTimeout(brandLookupTimer);
-    brandLookupTimer = setTimeout(() => triggerBrandLookup(val, "domain"), 250);
+    brandLookupTimer = setTimeout(() => triggerBrandLookup(val, "domain"), 200);
   });
 
   btnAddBrand.addEventListener("click", async () => {
@@ -606,7 +644,7 @@ document.addEventListener("DOMContentLoaded", () => {
         brandRegMsg.classList.remove("hidden");
         newBrandName.value = "";
         newBrandDomain.value = "";
-        if (newBrandCategory) newBrandCategory.value = "";
+        if (newBrandCategory) newBrandCategory.selectedIndex = 0;
         loadBrandCatalog();
       }
     } catch (err) {

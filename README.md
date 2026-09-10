@@ -3,11 +3,23 @@
 > **Autonomous AI/ML Zero-Day Phishing, Visual Clone Intercept & Brand Defense System**  
 > *Developed for Enterprise SOC Operations & Smart India Hackathon (SIH 1454) — Production-Ready Edition v2.4*
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7.svg?style=flat&logo=render)](https://phishshield-ai-1yyk.onrender.com)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com/)
-[![Pytest](https://img.shields.io/badge/Pytest-Passing%2020%2F20-success.svg)](https://docs.pytest.org/)
+[![Pytest](https://img.shields.io/badge/Pytest-Passing%2025%2F25-success.svg)](https://docs.pytest.org/)
 [![STIX](https://img.shields.io/badge/STIX-2.1%20Compliant-orange.svg)](https://oasis-open.github.io/cti-documentation/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+---
+
+### 🌐 Live Production Deployment
+
+| Service | Live URL | Description |
+| :--- | :--- | :--- |
+| 🛡️ **SOC Admin Dashboard** | [phishshield-ai-1yyk.onrender.com](https://phishshield-ai-1yyk.onrender.com) | Real-time web scanner, visual clone interceptor & brand vault |
+| ⚡ **Swagger / OpenAPI** | [phishshield-ai-1yyk.onrender.com/docs](https://phishshield-ai-1yyk.onrender.com/docs) | Interactive API exploration and test client |
+| 📖 **ReDoc Documentation** | [phishshield-ai-1yyk.onrender.com/redoc](https://phishshield-ai-1yyk.onrender.com/redoc) | Enterprise REST API specifications |
+| 🩺 **System Health Check** | [phishshield-ai-1yyk.onrender.com/api/v1/health](https://phishshield-ai-1yyk.onrender.com/api/v1/health) | Live telemetry & engine status endpoint |
 
 ---
 

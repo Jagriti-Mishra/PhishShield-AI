@@ -304,6 +304,11 @@ Generates standardized export formats: **STIX 2.1**, **MISP**, **Suricata**, **D
 
 ---
 
+## 🛡️ License
+Released under the **[MIT License](LICENSE)**. Developed for Smart India Hackathon (SIH 1454).
+
+---
+
 ## 🤝 Connect With Me
 
 <div align="center">
@@ -317,9 +322,4 @@ Generates standardized export formats: **STIX 2.1**, **MISP**, **Suricata**, **D
 *Feel free to reach out, contribute, or open an issue. If you like this project, don't forget to star ⭐ the repository!*
 
 </div>
-
----
-
-## 🛡️ License
-Released under the **[MIT License](LICENSE)**. Developed for Smart India Hackathon (SIH 1454).
 

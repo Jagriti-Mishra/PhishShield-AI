@@ -42,9 +42,9 @@ WORKDIR /app
 # Initialize reference brand signatures
 RUN python backend/seed_brand_data.py
 
-EXPOSE 8000
+EXPOSE 8000 10000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/api/v1/health || exit 1
 
 CMD ["python", "run_server.py"]

@@ -300,9 +300,26 @@ Generates standardized export formats: **STIX 2.1**, **MISP**, **Suricata**, **D
 | **Visual Impersonation Algorithm** | None / Naive template match | **64-bit dHash + 128-D Spatial Color Moments** |
 | **AitM Phishing Kit Detection** | 0% (Blind to JavaScript execution) | **100% AST Heuristic Interception** |
 | **Newly Registered Domain Triage** | Missing / Manual | **Automated Single-Pass NRD Stream** |
-| **Automated Unit & Integration Tests** | 0 tests | **20 / 20 Pytest Passing** |
+| **Automated Unit & Integration Tests** | 0 tests | **25 / 25 Pytest Passing (100%)** |
+
+---
+
+## 🤝 Connect With Me
+
+<div align="center">
+
+### Made with ❤️ by **[Jagriti Mishra](https://github.com/Jagriti-Mishra)**
+
+[![GitHub Profile](https://img.shields.io/badge/GitHub-Jagriti--Mishra-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Jagriti-Mishra)
+[![Repository](https://img.shields.io/badge/Repository-PhishShield--AI-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Jagriti-Mishra/PhishShield-AI)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://phishshield-ai-1yyk.onrender.com)
+
+*Feel free to reach out, contribute, or open an issue. If you like this project, don't forget to star ⭐ the repository!*
+
+</div>
 
 ---
 
 ## 🛡️ License
-Released under the **MIT License**. Created for the Smart India Hackathon (SIH 1454).
+Released under the **[MIT License](LICENSE)**. Developed for Smart India Hackathon (SIH 1454).
+

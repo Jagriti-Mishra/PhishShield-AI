@@ -10,18 +10,22 @@ from app.core.config import settings
 URGENCY_KEYWORDS = [
     "urgent", "immediately", "within 24 hours", "action required", "suspended",
     "blocked", "terminated", "kyc update", "verify now", "account locked",
-    "unauthorized activity", "security alert", "penalty", "compromised"
+    "unauthorized activity", "security alert", "penalty", "compromised",
+    "session expired", "identity deactivation", "mandatory update", "account closure"
 ]
 
 CREDENTIAL_BAITING_KEYWORDS = [
     "enter your password", "confirm your pin", "debit card details", "cvv",
     "otp", "one time password", "netbanking password", "aadhaar number",
-    "pan card", "social security", "credit card number", "expiry date"
+    "pan card", "social security", "credit card number", "expiry date",
+    "mfa token", "seed phrase", "private key", "2fa code", "upi pin",
+    "security questions", "authenticator prompt"
 ]
 
 FINANCIAL_LURE_KEYWORDS = [
     "lottery", "cashback", "reward points", "refund pending", "claim 5000",
-    "bonus credited", "income tax refund", "free subscription", "crypto giveaway"
+    "bonus credited", "income tax refund", "free subscription", "crypto giveaway",
+    "airdrop token", "unclaimed funds", "payment remittance", "settlement approved"
 ]
 
 class NLPAnalyzer(BaseAnalyzer):

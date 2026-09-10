@@ -47,6 +47,12 @@ def create_app() -> FastAPI:
     # Mount API v1 Router
     app.include_router(api_router, prefix=settings.API_V1_STR)
 
+    # Root redirect to Dashboard
+    @app.get("/", include_in_schema=False)
+    def root_redirect():
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/dashboard/index.html")
+
     # Mount Static Files for Rendered Screenshot Captures
     if os.path.exists(settings.CAPTURES_DIR):
         app.mount("/captures", StaticFiles(directory=settings.CAPTURES_DIR), name="captures")
@@ -60,3 +66,4 @@ def create_app() -> FastAPI:
     return app
 
 app = create_app()
+

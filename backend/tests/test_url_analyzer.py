@@ -80,3 +80,34 @@ def test_raw_ip_address(url_analyzer):
     res = url_analyzer.analyze(ctx)
     assert res.details.get("is_ip") is True
     assert res.score >= 50.0
+
+def test_punycode_homoglyph_domain(url_analyzer):
+    ctx = AnalysisContext(
+        raw_url="http://xn--pypal-4ve.com/login",
+        normalized_url="http://xn--pypal-4ve.com/login",
+        scheme="http",
+        domain="xn--pypal-4ve.com",
+        subdomain="",
+        suffix="com",
+        path="/login",
+        is_official_brand=False
+    )
+    res = url_analyzer.analyze(ctx)
+    assert res.details.get("has_homoglyphs") is True
+    assert res.score >= 50.0
+
+def test_suspicious_port_anomaly(url_analyzer):
+    ctx = AnalysisContext(
+        raw_url="http://fake-portal.org:8443/auth",
+        normalized_url="http://fake-portal.org:8443/auth",
+        scheme="http",
+        domain="fake-portal.org",
+        subdomain="",
+        suffix="org",
+        path="/auth",
+        is_official_brand=False
+    )
+    res = url_analyzer.analyze(ctx)
+    assert res.details.get("port") == 8443
+    assert res.score >= 25.0
+

@@ -22,6 +22,7 @@ if __name__ == "__main__":
     print(f" [OpenAPI Swagger] http://127.0.0.1:8000/docs")
     print(f" [ReDoc API Docs]  http://127.0.0.1:8000/redoc")
     print(f" [Health Check]    http://127.0.0.1:8000/api/v1/health")
-    print("="*75 + "\n")
+    port = int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "0.0.0.0")
 
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("app.main:app", host=host, port=port, reload=False)

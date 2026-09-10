@@ -11,9 +11,15 @@ HIGH_RISK_REGISTRARS = [
 ]
 
 class WHOISAnalyzer(BaseAnalyzer):
+    def __init__(self):
+        self._rdap_cache: Dict[str, Dict[str, Any]] = {}
+
     def fetch_rdap_info(self, domain: str) -> Dict[str, Any]:
-        """Queries public open-source RDAP (Registration Data Access Protocol) for WHOIS records."""
+        """Queries public open-source RDAP (Registration Data Access Protocol) for WHOIS records with in-memory caching."""
         clean_domain = domain.split(":")[0].lower()
+        if clean_domain in self._rdap_cache:
+            return self._rdap_cache[clean_domain]
+
         rdap_url = f"https://rdap.org/domain/{clean_domain}"
         
         try:
@@ -43,17 +49,21 @@ class WHOISAnalyzer(BaseAnalyzer):
                                     registrar = item[3]
                                     break
 
-                return {
+                result = {
                     "available": True,
                     "registered_at": reg_date,
                     "expires_at": exp_date,
                     "registrar": registrar,
                     "status": data.get("status", [])
                 }
+                self._rdap_cache[clean_domain] = result
+                return result
         except Exception as e:
             logger.debug(f"RDAP lookup error for {domain}: {e}")
 
-        return {"available": False, "registrar": "Unknown", "registered_at": None}
+        fallback = {"available": False, "registrar": "Unknown", "registered_at": None}
+        self._rdap_cache[clean_domain] = fallback
+        return fallback
 
     def analyze(self, context: AnalysisContext) -> AnalysisResult:
         if context.is_official_brand:
@@ -81,7 +91,7 @@ class WHOISAnalyzer(BaseAnalyzer):
                 # Parse ISO date string (e.g. 2026-08-15T10:00:00Z)
                 date_str = rdap_data["registered_at"][:10]
                 reg_dt = datetime.datetime.strptime(date_str, "%Y-%m-%d")
-                now = datetime.datetime.utcnow()
+                now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
                 domain_age_days = (now - reg_dt).days
                 details["domain_age_days"] = domain_age_days
 
@@ -118,3 +128,4 @@ class WHOISAnalyzer(BaseAnalyzer):
             reasons=reasons,
             details=details
         )
+

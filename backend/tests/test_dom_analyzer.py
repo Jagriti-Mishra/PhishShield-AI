@@ -45,7 +45,7 @@ def test_obfuscated_javascript_detection(dom_analyzer):
     <html>
       <head>
         <script>
-          var _0x1a2b = ["\x65\x76\x61\x6c", "\x75\x6e\x65\x73\x63\x61\x70\x65"];
+          var _0x1a2b = ["\\x65\\x76\\x61\\x6c", "\\x75\\x6e\\x65\\x73\\x63\\x61\\x70\\x65"];
           eval(unescape('%64%6f%63%75%6d%65%6e%74%2e%77%72%69%74%65'));
         </script>
       </head>
@@ -66,3 +66,27 @@ def test_obfuscated_javascript_detection(dom_analyzer):
     res = dom_analyzer.analyze(ctx)
     assert res.details.get("js_obfuscation_detected") is True
     assert res.score >= 25.0
+
+def test_hidden_iframe_overlay_detection(dom_analyzer):
+    html = """
+    <html>
+      <body>
+        <iframe src="http://hidden-c2-payload.com" style="display:none;" width="0" height="0"></iframe>
+      </body>
+    </html>
+    """
+    ctx = AnalysisContext(
+        raw_url="http://overlay-attack.com",
+        normalized_url="http://overlay-attack.com",
+        scheme="http",
+        domain="overlay-attack.com",
+        subdomain="",
+        suffix="com",
+        path="/",
+        html_content=html,
+        is_official_brand=False
+    )
+    res = dom_analyzer.analyze(ctx)
+    assert res.details.get("hidden_iframes") == 1
+    assert res.score >= 30.0
+

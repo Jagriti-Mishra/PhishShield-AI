@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -13,12 +14,12 @@ vector_store = VectorStore()
 pipeline = AnalysisPipeline(vector_store)
 
 @router.post("/analyze", response_model=AnalysisResponse)
-def analyze_url(req: URLAnalysisRequest, db: Session = Depends(get_db)):
+async def analyze_url(req: URLAnalysisRequest, db: Session = Depends(get_db)):
     raw_url = req.url.strip()
     if not raw_url:
         raise HTTPException(status_code=400, detail="Target URL cannot be empty")
 
-    scan_res = pipeline.analyze(raw_url)
+    scan_res = await pipeline.analyze_async(raw_url)
 
     # Persist to database via ScanRepository
     scan_repo = ScanRepository(db)
@@ -49,16 +50,27 @@ def analyze_url(req: URLAnalysisRequest, db: Session = Depends(get_db)):
     return scan_res
 
 @router.post("/batch")
-def analyze_batch(req: BatchAnalysisRequest, db: Session = Depends(get_db)):
-    results = []
+async def analyze_batch(req: BatchAnalysisRequest, db: Session = Depends(get_db)):
     scan_repo = ScanRepository(db)
+    valid_urls = [u.strip() for u in req.urls if u and u.strip()]
 
-    for u in req.urls:
-        u_clean = u.strip()
-        if not u_clean:
-            continue
+    async def _scan_single(u_clean: str):
         try:
-            res = pipeline.analyze(u_clean)
+            res = await pipeline.analyze_async(u_clean)
+            return res
+        except Exception as e:
+            return {
+                "url": u_clean,
+                "domain": u_clean,
+                "error": str(e),
+                "assessment": {"overall_score": 0.0, "risk_level": "ERROR"}
+            }
+
+    raw_results = await asyncio.gather(*[_scan_single(u) for u in valid_urls])
+    results = []
+
+    for res in raw_results:
+        if "error" not in res:
             assessment = res["assessment"]
             breakdown = assessment.get("breakdown", {})
 
@@ -82,13 +94,7 @@ def analyze_batch(req: BatchAnalysisRequest, db: Session = Depends(get_db)):
                 "details_json": res.get("details", {})
             })
             res["id"] = rec.id
-            results.append(res)
-        except Exception as e:
-            results.append({
-                "url": u_clean,
-                "domain": u_clean,
-                "error": str(e),
-                "assessment": {"overall_score": 0.0, "risk_level": "ERROR"}
-            })
+        results.append(res)
 
     return {"count": len(results), "results": results}
+

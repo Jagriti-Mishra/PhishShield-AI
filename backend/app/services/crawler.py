@@ -1,8 +1,11 @@
 import os
 import hashlib
 import time
+import socket
+import ssl
+import asyncio
 from urllib.parse import urlparse
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Any, Optional
 import requests
 from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw
@@ -15,17 +18,70 @@ class StealthCrawler:
         self.timeout = settings.CRAWLER_TIMEOUT_SECONDS
         self.user_agent = settings.USER_AGENT
 
-    def capture(self, url: str) -> Tuple[str, str, Dict[str, str]]:
+    @staticmethod
+    def inspect_ssl(hostname: str, port: int = 443, timeout: float = 2.5) -> Dict[str, Any]:
+        """Extracts X.509 certificate metadata and transport posture."""
+        ssl_info = {
+            "has_ssl": False,
+            "issuer": None,
+            "subject": None,
+            "valid_from": None,
+            "valid_until": None,
+            "san": [],
+            "is_self_signed": False,
+            "version": None,
+            "error": None
+        }
+        clean_host = hostname.split(":")[0].strip()
+        if not clean_host:
+            return ssl_info
+
+        try:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            with socket.create_connection((clean_host, port), timeout=timeout) as sock:
+                with ctx.wrap_socket(sock, server_hostname=clean_host) as ssock:
+                    cert = ssock.getpeercert(binary_form=False)
+                    version = ssock.version()
+                    ssl_info["has_ssl"] = True
+                    ssl_info["version"] = version
+                    if cert:
+                        # Parse Issuer & Subject
+                        issuer_dict = dict(x[0] for x in cert.get("issuer", []))
+                        subject_dict = dict(x[0] for x in cert.get("subject", []))
+                        ssl_info["issuer"] = issuer_dict.get("organizationName") or issuer_dict.get("commonName")
+                        ssl_info["subject"] = subject_dict.get("commonName")
+                        ssl_info["valid_from"] = cert.get("notBefore")
+                        ssl_info["valid_until"] = cert.get("notAfter")
+                        # Subject Alternative Names (SAN)
+                        sans = [item[1] for item in cert.get("subjectAltName", []) if item[0] == "DNS"]
+                        ssl_info["san"] = sans
+                        # Check self-signed
+                        if issuer_dict == subject_dict:
+                            ssl_info["is_self_signed"] = True
+        except Exception as e:
+            ssl_info["error"] = str(e)
+
+        return ssl_info
+
+    def capture(self, url: str) -> Tuple[str, str, Dict[str, str], Dict[str, Any]]:
         """
         Executes stealth rendering and returns:
-        (screenshot_path, html_content, response_headers)
+        (screenshot_path, html_content, response_headers, ssl_info)
         """
         formatted_url = url if "://" in url else f"http://{url}"
+        parsed = urlparse(formatted_url)
+        domain = parsed.netloc.split(":")[0].lower()
+        is_https_scheme = parsed.scheme.lower() == "https"
+
         url_hash = hashlib.md5(formatted_url.encode()).hexdigest()[:12]
+        os.makedirs(settings.CAPTURES_DIR, exist_ok=True)
         screenshot_path = os.path.join(settings.CAPTURES_DIR, f"cap_{url_hash}.png")
 
         html_content = ""
         headers = {}
+        ssl_info = {"has_ssl": is_https_scheme, "is_self_signed": False}
 
         # 1. Try Live HTTP/HTTPS Fetch
         try:
@@ -38,17 +94,26 @@ class StealthCrawler:
             resp = requests.get(formatted_url, headers=req_headers, timeout=self.timeout, verify=False)
             html_content = resp.text
             headers = dict(resp.headers)
-            status_code = resp.status_code
         except Exception as e:
             logger.debug(f"Live network fetch failed for {formatted_url}: {e}")
-            # If live fetch fails (e.g. offline phishing demo link), synthesize realistic page content
             html_content = self._generate_simulated_html(formatted_url)
             headers = {"Server": "nginx/1.24.0", "Content-Type": "text/html; charset=UTF-8"}
 
-        # 2. Generate/Render High-Fidelity Screenshot Viewport
+        # 2. Inspect SSL if HTTPS
+        if is_https_scheme:
+            try:
+                ssl_info = self.inspect_ssl(domain)
+            except Exception as e:
+                logger.debug(f"SSL cert inspection error for {domain}: {e}")
+
+        # 3. Generate/Render High-Fidelity Screenshot Viewport
         self._render_viewport_screenshot(screenshot_path, formatted_url, html_content)
 
-        return screenshot_path, html_content, headers
+        return screenshot_path, html_content, headers, ssl_info
+
+    async def capture_async(self, url: str) -> Tuple[str, str, Dict[str, str], Dict[str, Any]]:
+        """Asynchronous wrapper for non-blocking network capture."""
+        return await asyncio.to_thread(self.capture, url)
 
     def _generate_simulated_html(self, url: str) -> str:
         """Generates sophisticated real-world adversarial phishing kit simulations when offline."""
@@ -217,3 +282,4 @@ class StealthCrawler:
             draw.text((395, 365), "Password", fill=(130, 140, 150))
 
         img.save(save_path)
+

@@ -2,6 +2,8 @@
 console.log("🛡️ PhishShield AI active on page:", window.location.href);
 
 const API_URL = "http://127.0.0.1:8000/api/v1/analyze";
+let isThreatDetected = false;
+let threatLevel = "SAFE";
 
 // Auto-scan page on load and inject real-time security warning banner if malicious
 function autoScanPage() {
@@ -24,11 +26,35 @@ function autoScanPage() {
     const score = assessment.overall_score || 0;
 
     if (level === "CRITICAL PHISHING" || level === "HIGH PHISHING" || level === "SUSPICIOUS") {
+      isThreatDetected = true;
+      threatLevel = level;
       injectWarningBanner(level, score, assessment.explainable_reasons || []);
+      attachFormInterception(level);
     }
   })
   .catch(err => {
     // API backend offline
+  });
+}
+
+function attachFormInterception(level) {
+  const forms = document.querySelectorAll("form");
+  forms.forEach(form => {
+    form.addEventListener("submit", function(e) {
+      if (isThreatDetected && (threatLevel === "CRITICAL PHISHING" || threatLevel === "HIGH PHISHING")) {
+        const confirmed = window.confirm(
+          `🚨 PHISHSHIELD AI SECURITY SHIELD BLOCK:\n\n` +
+          `This website is flagged as a ${threatLevel} attack targeting your credentials.\n\n` +
+          `Submitting this form may transmit your password or personal data to an adversary.\n\n` +
+          `Do you really want to proceed?`
+        );
+        if (!confirmed) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }
+    }, true);
   });
 }
 
@@ -98,3 +124,4 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true;
 });
+

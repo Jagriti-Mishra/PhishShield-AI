@@ -101,7 +101,9 @@ class DOMAnalyzer(BaseAnalyzer):
             (r"debugger\s*;", "Anti-Forensics: Anti-debugging execution trap"),
             (r"setInterval\s*\(\s*function\s*\(\s*\)\s*\{\s*debugger", "Continuous DevTools killer loop"),
             (r"window\.location\.replace", "Immediate client-side redirect"),
-            (r"document\.cookie", "Session Token / Cookie Exfiltration Attempt")
+            (r"document\.cookie", "Session Token / Cookie Exfiltration Attempt"),
+            (r"navigator\.sendBeacon", "Silent background telemetry beacon"),
+            (r"WebSocket\s*\(", "Real-time socket exfiltration channel")
         ]
 
         found_js_tricks = []
@@ -139,7 +141,22 @@ class DOMAnalyzer(BaseAnalyzer):
             score += 40.0
             reasons.append(f"Brand Asset Leeching: Page hotlinks authentic logos/styles directly from official servers of: {', '.join(hotlinked_brands)}")
 
-        # 4. Anti-Analysis / Right-Click & DevTools Blocker Detection
+        # 4. Hidden Iframe Overlays / Clickjacking Traps
+        iframes = soup.find_all("iframe")
+        hidden_iframes = 0
+        for iframe in iframes:
+            style = iframe.get("style", "").lower()
+            width = iframe.get("width", "")
+            height = iframe.get("height", "")
+            if "display:none" in style.replace(" ", "") or "opacity:0" in style.replace(" ", "") or width in ["0", "1"] or height in ["0", "1"]:
+                hidden_iframes += 1
+
+        details["hidden_iframes"] = hidden_iframes
+        if hidden_iframes > 0:
+            score += 30.0
+            reasons.append(f"Hidden Iframe Injected: {hidden_iframes} invisible iframe(s) detected for session hijacking or overlay attacks")
+
+        # 5. Anti-Analysis / Right-Click & DevTools Blocker Detection
         raw_html_lower = html_content.lower()
         anti_analysis_detected = False
         if any(term in raw_html_lower for term in ["event.keycode == 123", "event.keycode==123", "oncontextmenu=\"return false\"", "onselectstart=\"return false\"", "debugger"]):
@@ -157,3 +174,4 @@ class DOMAnalyzer(BaseAnalyzer):
             reasons=reasons,
             details=details
         )
+

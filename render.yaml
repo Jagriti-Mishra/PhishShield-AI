@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: phishshield-ai
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PROJECT_NAME
+        value: "PhishShield AI — Enterprise Multimodal Phishing Detector"
+      - key: VERSION
+        value: "2.4.0"
+      - key: DEBUG
+        value: "False"
+      - key: CRAWLER_TIMEOUT_SECONDS
+        value: "8"
+      - key: CRITICAL_RISK_THRESHOLD
+        value: "70.0"
+      - key: HIGH_RISK_THRESHOLD
+        value: "55.0"
+      - key: SUSPICIOUS_RISK_THRESHOLD
+        value: "35.0"
+      - key: VISUAL_CLONE_THRESHOLD
+        value: "0.72"

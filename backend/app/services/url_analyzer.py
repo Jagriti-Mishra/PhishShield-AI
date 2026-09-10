@@ -15,6 +15,8 @@ SUSPICIOUS_TLDS = {
     ".fit", ".cfd", ".sbs", ".quest"
 }
 
+SUSPICIOUS_PORTS = {8080, 8443, 8888, 9000, 9443, 4443, 8000, 8081, 7070}
+
 # Common homoglyph mappings (Cyrillic/Greek/Latin lookalikes)
 HOMOGLYPH_MAP = {
     'а': 'a', 'с': 'c', 'е': 'e', 'о': 'o', 'р': 'p', 'ѕ': 's', 'х': 'x', 'у': 'y',
@@ -36,9 +38,17 @@ class URLAnalyzer(BaseAnalyzer):
 
     @staticmethod
     def detect_homoglyphs(domain: str) -> tuple[bool, str]:
-        """Detects if non-ASCII characters or Unicode lookalikes are present in the domain."""
+        """Detects if non-ASCII characters, Punycode, or Unicode lookalikes are present in the domain."""
         has_homoglyphs = False
         normalized_chars = []
+
+        if domain.startswith("xn--") or ".xn--" in domain:
+            has_homoglyphs = True
+            try:
+                domain = domain.encode("ascii").decode("idna")
+            except Exception:
+                pass
+
         for char in domain:
             if char in HOMOGLYPH_MAP:
                 has_homoglyphs = True
@@ -54,6 +64,7 @@ class URLAnalyzer(BaseAnalyzer):
     def analyze(self, context: AnalysisContext) -> AnalysisResult:
         domain = context.domain.lower()
         full_url = context.normalized_url.lower()
+        parsed = urlparse(context.normalized_url)
 
         # Check official whitelist
         if context.is_official_brand:
@@ -69,21 +80,28 @@ class URLAnalyzer(BaseAnalyzer):
         reasons = []
         details = {}
 
-        # 1. IP Address Host Check
-        is_ip = bool(re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", domain))
+        # 1. IP Address Host Check (Dotted Quad, Hex, Decimal)
+        is_ip = bool(re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", domain)) or domain.startswith("0x") or (domain.isdigit() and len(domain) > 7)
         details["is_ip"] = is_ip
         if is_ip:
             score += 50.0
-            reasons.append("Raw IPv4 address used as host instead of registered domain name")
+            reasons.append("Raw IPv4/Hex/Decimal address used as host instead of registered domain name")
 
-        # 2. Homoglyph Detection
+        # 2. Port Anomaly (AitM Reverse Proxy Ports)
+        port = parsed.port
+        details["port"] = port
+        if port and port in SUSPICIOUS_PORTS:
+            score += 25.0
+            reasons.append(f"Non-standard web port detected (Port {port}) frequently deployed in AitM reverse-proxy phishing kits")
+
+        # 3. Homoglyph & Punycode Detection
         has_homoglyphs, normalized_domain = self.detect_homoglyphs(domain)
         details["has_homoglyphs"] = has_homoglyphs
         if has_homoglyphs:
             score += 55.0
             reasons.append(f"Unicode Homoglyph / Confusable characters detected in domain (Resolves to: '{normalized_domain}')")
 
-        # 3. Domain Shannon Entropy (DGA Detection)
+        # 4. Domain Shannon Entropy (DGA Detection)
         ext = tldextract.extract(domain)
         domain_sld = ext.domain
         entropy = self.calculate_entropy(domain_sld)
@@ -92,7 +110,7 @@ class URLAnalyzer(BaseAnalyzer):
             score += 25.0
             reasons.append(f"High domain character entropy ({entropy}) indicates algorithmically generated (DGA) phishing domain")
 
-        # 4. Suspicious TLD
+        # 5. Suspicious TLD
         tld_dot = f".{ext.suffix}"
         is_suspicious_tld = tld_dot in SUSPICIOUS_TLDS
         details["suspicious_tld"] = is_suspicious_tld
@@ -100,7 +118,7 @@ class URLAnalyzer(BaseAnalyzer):
             score += 20.0
             reasons.append(f"Domain uses high-abuse / high-risk top-level domain: '{tld_dot}'")
 
-        # 5. Excessive Subdomain Nesting
+        # 6. Excessive Subdomain Nesting
         subdomain_parts = ext.subdomain.split(".") if ext.subdomain else []
         subdomain_count = len([p for p in subdomain_parts if p])
         details["subdomain_depth"] = subdomain_count
@@ -108,7 +126,7 @@ class URLAnalyzer(BaseAnalyzer):
             score += 15.0
             reasons.append(f"Excessive subdomain depth ({subdomain_count} levels) used to mask real destination")
 
-        # 6. Brand Keyword Typosquatting / Combosquatting
+        # 7. Brand Keyword Typosquatting / Combosquatting
         all_brands = self.vector_store.get_all_brands()
         matched_brand_typo = None
         min_distance = 999
@@ -134,7 +152,7 @@ class URLAnalyzer(BaseAnalyzer):
         details["matched_brand_typo"] = matched_brand_typo
         details["levenshtein_distance"] = min_distance if min_distance != 999 else None
 
-        # 7. Suspicious Keywords in URL Path
+        # 8. Suspicious Keywords in URL Path
         suspicious_keywords = ["login", "signin", "verify", "secure", "update", "banking", "kyc", "account", "wallet", "recover", "authenticate"]
         found_keywords = [kw for kw in suspicious_keywords if kw in full_url]
         details["suspicious_keywords"] = found_keywords
@@ -150,3 +168,4 @@ class URLAnalyzer(BaseAnalyzer):
             reasons=reasons,
             details=details
         )
+

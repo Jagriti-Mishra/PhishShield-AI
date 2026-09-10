@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 class STIXExporter:
@@ -8,7 +8,7 @@ class STIXExporter:
         indicator_id = f"indicator--{uuid.uuid4()}"
         identity_id = f"identity--{uuid.uuid4()}"
         observed_id = f"observed-data--{uuid.uuid4()}"
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         overall_score = assessment.get("overall_score", 0.0)
         risk_level = assessment.get("risk_level", "UNKNOWN")

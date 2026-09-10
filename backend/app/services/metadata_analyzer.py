@@ -12,11 +12,12 @@ class MetadataAnalyzer(BaseAnalyzer):
                 score=0.0,
                 weight=settings.WEIGHT_METADATA_SSL,
                 reasons=[],
-                details={"is_https": True, "has_hsts": True, "has_csp": True}
+                details={"is_https": True, "has_hsts": True, "has_csp": True, "is_self_signed": False}
             )
 
         headers = {k.lower(): v for k, v in context.headers.items()}
         is_https = (context.scheme.lower() == "https")
+        ssl_info = context.ssl_info or {}
 
         score = 0.0
         reasons = []
@@ -24,29 +25,37 @@ class MetadataAnalyzer(BaseAnalyzer):
             "is_https": is_https,
             "has_hsts": False,
             "has_csp": False,
-            "has_xframe": False
+            "has_xframe": False,
+            "ssl_issuer": ssl_info.get("issuer"),
+            "is_self_signed": ssl_info.get("is_self_signed", False),
+            "ssl_san_count": len(ssl_info.get("san", []))
         }
 
         # 1. Plain HTTP Check
         if not is_https:
             score += 45.0
             reasons.append("Unencrypted Connection: Target lacks HTTPS SSL/TLS encryption")
+        else:
+            # 2. Self-signed or untrusted SSL
+            if ssl_info.get("is_self_signed"):
+                score += 35.0
+                reasons.append(f"Untrusted SSL: Self-signed X.509 certificate detected for host (Issuer: {ssl_info.get('issuer')})")
 
-        # 2. Strict Transport Security (HSTS)
+        # 3. Strict Transport Security (HSTS)
         if "strict-transport-security" in headers:
             details["has_hsts"] = True
         elif is_https:
             score += 15.0
             reasons.append("Missing HSTS (Strict-Transport-Security) transport layer protection")
 
-        # 3. Content Security Policy (CSP)
+        # 4. Content Security Policy (CSP)
         if "content-security-policy" in headers:
             details["has_csp"] = True
         else:
             score += 10.0
             reasons.append("Missing Content-Security-Policy (CSP) anti-XSS header")
 
-        # 4. Clickjacking Protection (X-Frame-Options)
+        # 5. Clickjacking Protection (X-Frame-Options)
         if "x-frame-options" in headers or "frame-ancestors" in headers.get("content-security-policy", ""):
             details["has_xframe"] = True
         else:
@@ -61,3 +70,4 @@ class MetadataAnalyzer(BaseAnalyzer):
             reasons=reasons,
             details=details
         )
+

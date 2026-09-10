@@ -85,3 +85,19 @@ def test_api_brand_registration_cross_brand_conflict():
     resp = client.post("/api/v1/brands/add", json=payload)
     assert resp.status_code == 409
     assert "Registration Conflict" in resp.json()["detail"]
+
+def test_api_batch_analyze():
+    """Verify asynchronous concurrent batch analysis."""
+    payload = {
+        "urls": [
+            "https://sbi.co.in",
+            "http://sbi-online-kyc-update.top",
+            "http://paypal-security-alert.xyz"
+        ]
+    }
+    resp = client.post("/api/v1/batch", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["count"] == 3
+    assert len(data["results"]) == 3
+

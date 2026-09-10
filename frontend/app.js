@@ -1,4 +1,6 @@
-const API_BASE = "http://127.0.0.1:8000/api/v1";
+const API_BASE = window.location.origin.startsWith("http")
+  ? `${window.location.origin}/api/v1`
+  : "http://127.0.0.1:8000/api/v1";
 
 document.addEventListener("DOMContentLoaded", () => {
   // ------------------------------------------------------------------------

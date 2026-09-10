@@ -1,11 +1,11 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 class MISPExporter:
     def generate_event(self, url: str, domain: str, assessment: Dict[str, Any]) -> Dict[str, Any]:
         event_uuid = str(uuid.uuid4())
-        now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
         score = assessment.get("overall_score", 0.0)
         risk_level = assessment.get("risk_level", "UNKNOWN")

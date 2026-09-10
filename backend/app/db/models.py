@@ -3,6 +3,9 @@ import datetime
 from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, Text, JSON
 from app.db.session import Base
 
+def _utcnow():
+    return datetime.datetime.now(datetime.timezone.utc)
+
 class ScanRecord(Base):
     __tablename__ = "scan_records"
 
@@ -29,7 +32,7 @@ class ScanRecord(Base):
     action_recommendation = Column(Text, nullable=True)
     details_json = Column(JSON, default=dict)
     
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+    created_at = Column(DateTime, default=_utcnow, index=True)
 
 class MonitoredBrand(Base):
     __tablename__ = "monitored_brands"
@@ -43,7 +46,7 @@ class MonitoredBrand(Base):
     dom_signature = Column(JSON, nullable=True)
     logo_url = Column(String(512), nullable=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=_utcnow)
 
 class NRDRecord(Base):
     __tablename__ = "nrd_records"
@@ -55,4 +58,5 @@ class NRDRecord(Base):
     source_feed = Column(String(100), default="WHOIS_NRD")
     status = Column(String(50), default="PENDING") # PENDING, SCANNED, SUSPICIOUS, BENIGN
     risk_score = Column(Float, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+    created_at = Column(DateTime, default=_utcnow, index=True)
+

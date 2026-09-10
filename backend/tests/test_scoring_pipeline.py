@@ -38,3 +38,13 @@ def test_paypal_phishing_domain(pipeline):
     assessment = res["assessment"]
     assert assessment["overall_score"] >= 85.0
     assert assessment["risk_level"] in ["HIGH PHISHING", "CRITICAL PHISHING"]
+
+@pytest.mark.anyio
+async def test_pipeline_analyze_async(pipeline):
+    res = await pipeline.analyze_async("http://sbi-online-kyc-update.top")
+    assessment = res["assessment"]
+    assert assessment["overall_score"] >= 85.0
+    assert assessment["risk_level"] in ["HIGH PHISHING", "CRITICAL PHISHING"]
+    assert "details" in res
+    assert "execution_time_seconds" in res
+

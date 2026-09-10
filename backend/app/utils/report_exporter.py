@@ -3,7 +3,8 @@ from typing import Dict, Any
 
 class ReportExporter:
     def generate_takedown_dossier(self, url: str, domain: str, assessment: Dict[str, Any], details: Dict[str, Any] = None) -> str:
-        now_str = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+        now_dt = datetime.datetime.now(datetime.timezone.utc)
+        now_str = now_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
         score = assessment.get("overall_score", 0.0)
         risk_level = assessment.get("risk_level", "UNKNOWN")
         matched_brand = assessment.get("matched_brand", "Targeted Organization")
@@ -16,7 +17,7 @@ Compliant with ICANN RAA & RFC 2142 Abuse Reporting Standards
 ================================================================================
 
 DATE & TIME (UTC): {now_str}
-REPORT IDENTIFIER: PSAI-INC-{int(datetime.datetime.utcnow().timestamp())}
+REPORT IDENTIFIER: PSAI-INC-{int(now_dt.timestamp())}
 TARGET OFFENSIVE URL: {url}
 OFFENDING DOMAIN / HOST: {domain}
 TARGETED ENTITY / BRAND: {str(matched_brand).upper()}

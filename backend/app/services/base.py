@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
@@ -15,6 +16,7 @@ class AnalysisContext:
     screenshot_path: Optional[str] = None
     headers: Dict[str, str] = field(default_factory=dict)
     whois_data: Dict[str, Any] = field(default_factory=dict)
+    ssl_info: Dict[str, Any] = field(default_factory=dict)
     is_official_brand: bool = False
     official_brand_name: Optional[str] = None
 
@@ -31,3 +33,8 @@ class BaseAnalyzer(ABC):
     def analyze(self, context: AnalysisContext) -> AnalysisResult:
         """Executes domain-specific detection heuristics and returns AnalysisResult."""
         pass
+
+    async def analyze_async(self, context: AnalysisContext) -> AnalysisResult:
+        """Asynchronous execution interface running on threadpool by default."""
+        return await asyncio.to_thread(self.analyze, context)
+
